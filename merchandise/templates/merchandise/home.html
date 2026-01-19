@@ -12,6 +12,7 @@
 
 {% endblock %}
 
+
 {% block content %}
 
 
@@ -66,7 +67,7 @@
         <div class="category-grid" role="list">
           <button class="category" role="listitem" aria-label="Waste to Wonder Creations: Upcycled art, recycled fabric, handmade paper, repurposed home decor, scrap metal and glass art" title="Upcycled Art & Craft; Recycled Fabric Items; Handmade Paper Products; Repurposed Home Décor; Scrap Metal & Glass Art">
             <span class="category-circle">
-              <!-- <img class="category-img" src="./team1-assets/images/waste-to-wonder.png" alt="Upcycled art and crafts"> -->
+              <img class="category-img" src="../static/merchandise/assets/images/waste-to-wonder.png" alt="Upcycled art and crafts">
             </span>
             <span class="category-label">Waste to Wonder</span>
           </button>
@@ -80,22 +81,21 @@
 
           <button class="category" role="listitem" aria-label="Natural & Eco Lifestyle Products: dhoop, candles, soaps, bamboo reusables, aromatherapy kits" title="Dhoop Battis & Herbal Incense; Eco Candles & Essential Oils; Handmade Soaps & Skincare; Bamboo Brushes, Cutlery, and Reusables; Aromatherapy Kits & Eco Wellness Sets">
             <span class="category-circle">
-              <!-- <img class="category-img" src="./team1-assets/images/natural-and-eco.png -->
-              " alt="Eco candles and natural wellness products">
+              <img class="category-img" src="../static/merchandise/assets/images/natural-and-eco.png" alt="Eco candles and natural wellness products">
             </span>
             <span class="category-label">Natural & Eco</span>
           </button>
 
           <button class="category" role="listitem" aria-label="Rural Wellness & Organic Produce: honey, herbal teas, pickles, grains, medicinal herbs" title="Himalayan Honey; Herbal Teas & Powders; Pickles, Jams & Local Snacks; Millet & Organic Grains; Medicinal Herbs & Wellness Mixes">
             <span class="category-circle">
-              <!-- <img class="category-img" src="./team1-assets/images/rural-wellness.png" alt="Honey and organic produce"> -->
+              <img class="category-img" src="../static/merchandise/assets/images/rural-wellness.png" alt="Honey and organic produce">
             </span>
             <span class="category-label">Rural Wellness</span>
           </button>
 
           <button class="category" role="listitem" aria-label="Student & Community Creations: student art, awareness posters, handmade crafts, reused stationery" title="Art from Recycled Materials; Awareness Posters; Handmade Crafts; Stationery or Reused Utility Products">
             <span class="category-circle">
-              <!-- <img class="category-img" src="./team1-assets/images/student-creation.png" alt="Student recycled art"> -->
+              <img class="category-img" src="../static/merchandise/assets/images/student-creation.png" alt="Student recycled art">
             </span>
             <span class="category-label">Student Creations</span>
           </button>
@@ -156,7 +156,7 @@
           <!-- product cards inserted by JS -->
         </div>
         <div class="products-footer">
-         <a href="team2-product_flow1.html">
+         <a href="{% url 'merchandise:products' %}">
            <button class="btn accent view-all">
             <span>View All Products</span>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -311,5 +311,6 @@
 {% endblock %}
 
 {% block extra_js %}
+<script src="{% static 'merchandise/js/cart.js' %}"></script>
 <script src="{% static 'merchandise/js/home.js' %}"></script>
 {% endblock %}

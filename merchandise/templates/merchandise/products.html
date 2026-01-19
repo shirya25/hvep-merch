@@ -10,6 +10,7 @@
 {% block extra_css %}
   <!-- Fonts: Inter for UI, Playfair Display for headlines -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
 
@@ -107,10 +108,10 @@
 
 </body>
 
-
 {% endblock %}
 
 {% block extra_js %}
+<script src="{% static 'merchandise/js/cart.js' %}"></script>
 <script src="{% static 'merchandise/js/products.js' %}"></script>
 {% endblock %}
 

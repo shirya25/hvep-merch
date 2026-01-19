@@ -1,0 +1,243 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Order Confirmed - Thank You!{% endblock %}
+
+{% block extra_css %}
+<style>
+    .thanks-container {
+        max-width: 800px;
+        margin: 80px auto 60px;
+        padding: 40px;
+        text-align: center;
+    }
+
+    .success-icon {
+        width: 100px;
+        height: 100px;
+        margin: 0 auto 30px;
+        background: linear-gradient(135deg, #4a7c2c, #6ab04c);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        animation: scaleIn 0.5s ease;
+    }
+
+    .success-icon i {
+        font-size: 50px;
+        color: white;
+    }
+
+    @keyframes scaleIn {
+        from {
+            transform: scale(0);
+            opacity: 0;
+        }
+        to {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+
+    .thanks-title {
+        font-size: 36px;
+        color: #2d5016;
+        margin-bottom: 20px;
+        font-weight: 700;
+    }
+
+    .thanks-message {
+        font-size: 18px;
+        color: #666;
+        margin-bottom: 30px;
+        line-height: 1.6;
+    }
+
+    .order-details {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 30px;
+        margin: 30px 0;
+        text-align: left;
+    }
+
+    .detail-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 12px 0;
+        border-bottom: 1px solid #e0e0e0;
+    }
+
+    .detail-row:last-child {
+        border-bottom: none;
+        font-weight: 600;
+        font-size: 18px;
+        color: #4a7c2c;
+    }
+
+    .detail-label {
+        color: #666;
+    }
+
+    .detail-value {
+        color: #333;
+        font-weight: 500;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        margin-top: 40px;
+        flex-wrap: wrap;
+    }
+
+    .btn {
+        padding: 14px 30px;
+        border: none;
+        border-radius: 6px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .btn-primary {
+        background: #4a7c2c;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: #3d6724;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(74, 124, 44, 0.3);
+    }
+
+    .btn-secondary {
+        background: white;
+        color: #4a7c2c;
+        border: 2px solid #4a7c2c;
+    }
+
+    .btn-secondary:hover {
+        background: #f0f7ed;
+    }
+
+    .next-steps {
+        margin-top: 40px;
+        padding: 25px;
+        background: #e8f5e9;
+        border-radius: 8px;
+        border-left: 4px solid #4a7c2c;
+    }
+
+    .next-steps h3 {
+        color: #2d5016;
+        margin-bottom: 15px;
+        font-size: 20px;
+    }
+
+    .next-steps ul {
+        list-style: none;
+        padding: 0;
+        text-align: left;
+    }
+
+    .next-steps li {
+        padding: 8px 0;
+        color: #555;
+    }
+
+    .next-steps li i {
+        color: #4a7c2c;
+        margin-right: 10px;
+    }
+
+    @media (max-width: 768px) {
+        .thanks-container {
+            padding: 20px;
+            margin-top: 40px;
+        }
+
+        .thanks-title {
+            font-size: 28px;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+        }
+
+        .btn {
+            width: 100%;
+        }
+    }
+</style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="thanks-container">
+    <div class="success-icon">
+        <i class="fas fa-check"></i>
+    </div>
+
+    <h1 class="thanks-title">Order Confirmed!</h1>
+    
+    <p class="thanks-message">
+        Thank you for supporting sustainable products! Your order has been successfully placed and you'll receive a confirmation email shortly.
+    </p>
+
+    <div class="order-details">
+        <h2 style="margin-bottom: 20px; color: #2d5016;">Order Summary</h2>
+        <div class="detail-row">
+            <span class="detail-label">Order Number:</span>
+            <span class="detail-value" id="orderNumber">ORD-2026-XXXX</span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-label">Order Date:</span>
+            <span class="detail-value" id="orderDate">-</span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-label">Estimated Delivery:</span>
+            <span class="detail-value">5-7 Business Days</span>
+        </div>
+    </div>
+
+    <div class="next-steps">
+        <h3><i class="fas fa-info-circle"></i> What Happens Next?</h3>
+        <ul>
+            <li><i class="fas fa-envelope"></i> You'll receive an order confirmation email</li>
+            <li><i class="fas fa-box"></i> Your order will be carefully packaged</li>
+            <li><i class="fas fa-truck"></i> Tracking details will be sent once shipped</li>
+            <li><i class="fas fa-leaf"></i> Your purchase supports sustainable artisans</li>
+        </ul>
+    </div>
+
+    <div class="action-buttons">
+        <a href="{% url 'merchandise:home' %}" class="btn btn-primary">
+            <i class="fas fa-home"></i> Continue Shopping
+        </a>
+        <a href="{% url 'merchandise:products' %}" class="btn btn-secondary">
+            <i class="fas fa-store"></i> Browse Products
+        </a>
+    </div>
+</div>
+
+<script>
+    // Generate order number
+    const orderNumber = 'ORD-2026-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+    document.getElementById('orderNumber').textContent = orderNumber;
+    
+    // Set order date
+    const today = new Date();
+    const dateStr = today.toLocaleDateString('en-IN', { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+    });
+    document.getElementById('orderDate').textContent = dateStr;
+</script>
+{% endblock %}

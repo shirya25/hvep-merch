@@ -8,3 +8,6 @@ def products(request):
 
 def checkout(request):
     return render(request, "merchandise/checkout.html")
+
+def thank(request):
+    return render(request, "merchandise/thanks.html")

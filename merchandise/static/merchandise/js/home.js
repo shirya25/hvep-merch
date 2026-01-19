@@ -1,4 +1,4 @@
-// Static site scripts: carousel, header scroll, render products
+// Updated home.js with cart integration
 
 const featuredProducts = [
   {
@@ -53,8 +53,8 @@ function renderProducts() {
       <div class="card-footer">
         <div class="price">${formatCurrency(p.price)}</div>
         <div class="card-actions">
-          <button class="btn ghost wishlist" data-id="${p.id}">♥</button>
-          <button class="btn" data-id="${p.id}">Add to Cart</button>
+          <button class="btn ghost wishlist" data-id="${p.id}" onclick="handleWishlist('${p.id}')">♥</button>
+          <button class="btn" data-id="${p.id}" onclick="handleAddToCart('${p.id}')">Add to Cart</button>
         </div>
       </div>
     `;
@@ -62,15 +62,27 @@ function renderProducts() {
   });
 }
 
+// Handle Add to Cart from home page
+function handleAddToCart(productId) {
+  const product = featuredProducts.find(p => p.id === productId);
+  if (product && window.CartManager) {
+    window.CartManager.addItem(product);
+  }
+}
+
+// Handle Wishlist
+function handleWishlist(productId) {
+  alert('Added to wishlist (feature coming soon)');
+}
+
 // Currency formatting helper for Indian Rupees
 const inrFormatter = new Intl.NumberFormat('en-IN', {
   style: 'currency',
   currency: 'INR',
-  maximumFractionDigits: 0 // No decimal places for rupees
+  maximumFractionDigits: 0
 });
 
 function formatCurrency(value) {
-  // Prices are stored in rupees, no conversion needed
   return inrFormatter.format(value);
 }
 
@@ -86,7 +98,7 @@ function initHeroCarousel() {
   const indicators = Array.from(document.querySelectorAll('.indicator'));
 
   function show(i, updateIndicators = true) {
-    i = ((i % total) + total) % total; // normalize
+    i = ((i % total) + total) % total;
     slides.forEach((s, si) => {
       const active = si === i;
       s.classList.toggle('active', active);
@@ -98,7 +110,6 @@ function initHeroCarousel() {
     idx = i;
   }
 
-  // Navigation
   prevBtn && prevBtn.addEventListener('click', () => {
     show(idx - 1);
     restartAutoplay();
@@ -108,7 +119,6 @@ function initHeroCarousel() {
     restartAutoplay();
   });
 
-  // Indicators
   indicators.forEach((ind, i) => {
     ind.addEventListener('click', () => {
       show(i);
@@ -116,7 +126,6 @@ function initHeroCarousel() {
     });
   });
 
-  // Keyboard support
   document.addEventListener('keydown', (e) => {
     if (e.key === 'ArrowLeft' || e.key === 'PageUp') { show(idx - 1); restartAutoplay(); }
     if (e.key === 'ArrowRight' || e.key === 'PageDown') { show(idx + 1); restartAutoplay(); }
@@ -132,7 +141,6 @@ function initHeroCarousel() {
   }
   function restartAutoplay() { stopAutoplay(); startAutoplay(); }
 
-  // pause on hover/focus
   const hero = document.getElementById('hero');
   if (hero) {
     hero.addEventListener('mouseenter', stopAutoplay);
@@ -141,7 +149,6 @@ function initHeroCarousel() {
     hero.addEventListener('focusout', startAutoplay);
   }
 
-  // initialize
   show(idx);
   startAutoplay();
 }
@@ -154,19 +161,16 @@ function initHeader() {
   
   if (!header || !menuToggle || !mainNav) return;
 
-  // Scroll behavior
   window.addEventListener('scroll', () => {
     if (window.scrollY > 10) header.classList.add('scrolled');
     else header.classList.remove('scrolled');
   });
 
-  // Mobile menu toggle
   menuToggle.addEventListener('click', () => {
     mainNav.classList.toggle('active');
     menuToggle.setAttribute('aria-expanded', mainNav.classList.contains('active'));
   });
 
-  // Close menu when clicking outside or on a link
   document.addEventListener('click', (e) => {
     if (!header.contains(e.target)) {
       mainNav.classList.remove('active');
@@ -186,11 +190,13 @@ document.addEventListener('DOMContentLoaded', () => {
   renderProducts();
   initHeroCarousel();
   initHeader();
-  // simple handlers
-  document.body.addEventListener('click', (e) => {
-    const t = e.target;
-    if (t.matches && t.matches('.wishlist')) {
-      alert('Added to wishlist (static demo)');
-    }
-  });
+  
+  // Initialize cart if available
+  if (window.CartManager) {
+    window.CartManager.init();
+  }
 });
+
+// Export functions
+window.handleAddToCart = handleAddToCart;
+window.handleWishlist = handleWishlist;

@@ -12,9 +12,6 @@
 
     <link rel="stylesheet" href="{% static 'merchandise/css/navstyle.css' %}">
     <link rel="stylesheet" href="{% static 'merchandise/css/footer.css' %}">
-
-
-
     {% block extra_css %}{% endblock %}
 </head>
 
@@ -79,6 +76,8 @@
             </div>
 
             <!-- Cart -->
+            <a href ="{% url 'merchandise:checkout' %}"
+            style="text-decoration: none; color: inherit;">
             <div class="nav-item cart" id="cartBtn">
                 <div style="position: relative;">
                     <i class="fas fa-shopping-cart cart-icon"></i>
@@ -86,13 +85,17 @@
                 </div>
                 <span class="cart-text">Cart</span>
             </div>
+            </a>
 
             <!-- navigation to home -->
+             <a href ="{% url 'merchandise:home' %}"
+            style="text-decoration: none; color: inherit;">
             <div class="nav-item home-btn" id="homeBtn">
                 <i class="fas fa-home"></i>
                 <div class="nav-item-content">
                 </div> 
             </div>
+            </a>
         </div>
         <!-- Bottom Navbar -->
         <div class="navbar-bottom">
@@ -174,11 +177,9 @@
     {% endblock %}
 
 
-
+    <script src="{% static 'merchandise/js/cart.js' %}"></script>
     <script src="{% static 'merchandise/js/navscript.js' %}"></script>
     <script src="{% static 'merchandise/js/footer.js' %}"></script>
 
-
 </body>
-
 </html>

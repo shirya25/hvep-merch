@@ -118,22 +118,12 @@ const cartBtn = document.getElementById('cartBtn');
 cartBtn.addEventListener('click', () => {
     console.log('Cart clicked. Items:', cart);
     showNotification(`You have ${cartCount} item(s) in your cart`, 'info');
-
-    // Redirect to cart page
-    // window.location.href = 'cart.html';
 });
 
 // Home Button Click
 const homeBtn = document.getElementById('homeBtn');
-homeBtn.addEventListener('click', () => {
-    window.location.href = 'https://himvillageprahari.org';
-});
-
 // Logo Click - Also redirect to home
 const logo = document.getElementById('logo');
-logo.addEventListener('click', () => {
-    window.location.href = 'https://himvillageprahari.org';
-});
 logo.style.cursor = 'pointer';
 
 // Location Modal
