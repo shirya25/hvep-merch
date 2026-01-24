@@ -21,3 +21,11 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name
+
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    full_name = models.CharField(max_length=100)
+    mobile = models.CharField(max_length=15)
+
+    def __str__(self):
+        return self.user.username

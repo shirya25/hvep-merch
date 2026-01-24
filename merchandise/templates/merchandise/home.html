@@ -4,7 +4,7 @@
 {% block title %}Merch Home | Waste to Wonder{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'merchandise/css/home.css' %}">
+<link rel="stylesheet" href="{% static 'merchandise/css/home.css' %}"> 
   <!-- Fonts: Inter for UI, Playfair Display for headlines -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -62,50 +62,26 @@
         </div>
       </section>
 
-      <!-- Categories (small circular badges under hero) -->
-      <section id="categories" class="categories container" aria-label="Product categories">
-        <div class="category-grid" role="list">
-          <button class="category" role="listitem" aria-label="Waste to Wonder Creations: Upcycled art, recycled fabric, handmade paper, repurposed home decor, scrap metal and glass art" title="Upcycled Art & Craft; Recycled Fabric Items; Handmade Paper Products; Repurposed Home Décor; Scrap Metal & Glass Art">
-            <span class="category-circle">
-              <img class="category-img" src="../static/merchandise/assets/images/waste-to-wonder.png" alt="Upcycled art and crafts">
-            </span>
-            <span class="category-label">Waste to Wonder</span>
-          </button>
 
-          <button class="category" role="listitem" aria-label="Himalayan Pahadi Products: local handicrafts, honey, textiles, spices, souvenirs" title="Local Handicrafts; Pahadi Honey & Herbal Teas; Handwoven Textiles; Local Spices & Dried Herbs; Cultural Souvenirs">
-            <span class="category-circle">
-              <img class="category-img" src="https://images.unsplash.com/photo-1501785888041-af3ef285b470?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=400" alt="Himalayan handicrafts and textiles">
-            </span>
-            <span class="category-label">Himalayan Pahadi</span>
+      <!-- Featured Products -->
+      <section id="products" class="products container">
+        <div class="section-head text-center">
+          <span class="section-tag">Handcrafted with Purpose</span>
+          <h2>Explore Our Collection</h2>
+          <p>Each piece tells a story of sustainability and artisanal craftsmanship</p>
+        </div>
+        <div class="product-grid" id="product-grid">
+          <!-- product cards inserted by JS -->
+        </div>
+        <div class="products-footer">
+         <a href="{% url 'merchandise:products' %}">
+           <button class="btn accent view-all">
+            <span>View All Products</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M5 12h14m-7-7l7 7-7 7"/>
+            </svg>
           </button>
-
-          <button class="category" role="listitem" aria-label="Natural & Eco Lifestyle Products: dhoop, candles, soaps, bamboo reusables, aromatherapy kits" title="Dhoop Battis & Herbal Incense; Eco Candles & Essential Oils; Handmade Soaps & Skincare; Bamboo Brushes, Cutlery, and Reusables; Aromatherapy Kits & Eco Wellness Sets">
-            <span class="category-circle">
-              <img class="category-img" src="../static/merchandise/assets/images/natural-and-eco.png" alt="Eco candles and natural wellness products">
-            </span>
-            <span class="category-label">Natural & Eco</span>
-          </button>
-
-          <button class="category" role="listitem" aria-label="Rural Wellness & Organic Produce: honey, herbal teas, pickles, grains, medicinal herbs" title="Himalayan Honey; Herbal Teas & Powders; Pickles, Jams & Local Snacks; Millet & Organic Grains; Medicinal Herbs & Wellness Mixes">
-            <span class="category-circle">
-              <img class="category-img" src="../static/merchandise/assets/images/rural-wellness.png" alt="Honey and organic produce">
-            </span>
-            <span class="category-label">Rural Wellness</span>
-          </button>
-
-          <button class="category" role="listitem" aria-label="Student & Community Creations: student art, awareness posters, handmade crafts, reused stationery" title="Art from Recycled Materials; Awareness Posters; Handmade Crafts; Stationery or Reused Utility Products">
-            <span class="category-circle">
-              <img class="category-img" src="../static/merchandise/assets/images/student-creation.png" alt="Student recycled art">
-            </span>
-            <span class="category-label">Student Creations</span>
-          </button>
-
-          <button class="category" role="listitem" aria-label="Eco Gift Hampers: festival gift sets, wellness hampers, sustainable starter kits, custom boxes" title="Festival Gift Sets; Wellness Hampers; Sustainable Starter Kits; Custom Eco Gift Boxes">
-            <span class="category-circle">
-              <img class="category-img" src="https://images.unsplash.com/photo-1544025162-d76694265947?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=400" alt="Eco gift hamper box">
-            </span>
-            <span class="category-label">Eco Gift Hampers</span>
-          </button>
+         </a>
         </div>
       </section>
 
@@ -137,65 +113,39 @@
           </div>
           <div class="ngo-visual">
             <div class="image-grid">
-              <img src="https://images.unsplash.com/photo-1758599668299-beebedfabf7b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=800" alt="community volunteers" class="main-image">
-              <img src="https://images.unsplash.com/photo-1594789202785-8023eeb2c75e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=400" alt="artisan crafting" class="secondary-image">
-              <img src="https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=400" alt="sustainable products" class="secondary-image">
+              <img src="https://media.licdn.com/dms/image/v2/D5622AQGGMOIHtLa4ag/feedshare-shrink_800/B56Zvr4nQLGYAg-/0/1769189045512?e=1770854400&v=beta&t=IyPTcqrKsZMHr7APsI0ATu_A8DPIPq-3TF24A6vUzIE" alt="community volunteers" class="main-image">
+              <img src="https://media.licdn.com/dms/image/v2/D4D22AQEg8zUmIkygHQ/feedshare-shrink_2048_1536/B4DZndvfVKH4Aw-/0/1760361856141?e=1770854400&v=beta&t=bIN6Ag3Qs7iE72nCnMMo9P6uc7pX1KgBnMlTVRvzNQc" alt="community volunteers" class="secondary-image">
+              <img src="https://media.licdn.com/dms/image/v2/D4D22AQFaDXr-OowvVA/feedshare-shrink_2048_1536/B4DZQxXu_LG0Ao-/0/1735995099579?e=1770854400&v=beta&t=BKcVrou5XC8w8WlQcBrjLyftHMDxjQF8OO-nTCl2O-s" alt="community volunteers" class="secondary-image">
             </div>
           </div>
-        </div>
-      </section>
-
-      <!-- Featured Products -->
-      <section id="products" class="products container">
-        <div class="section-head text-center">
-          <span class="section-tag">Handcrafted with Purpose</span>
-          <h2>Explore Our Collection</h2>
-          <p>Each piece tells a story of sustainability and artisanal craftsmanship</p>
-        </div>
-        <div class="product-grid" id="product-grid">
-          <!-- product cards inserted by JS -->
-        </div>
-        <div class="products-footer">
-         <a href="{% url 'merchandise:products' %}">
-           <button class="btn accent view-all">
-            <span>View All Products</span>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M5 12h14m-7-7l7 7-7 7"/>
-            </svg>
-          </button>
-         </a>
         </div>
       </section>
 
       <!-- Product Stories -->
       <section id="stories" class="container stories">
         <div class="section-head text-center">
-          <span class="story-tag">Artisan Stories</span>
-          <h2>Meet Our Creative Heroes</h2>
-          <p class="story-lead">Behind every product is a story of transformation and hope</p>
+          <span class="story-tag">Stories</span>
+          <h2>Our Team in Action</h2>
+          <p class="story-lead">Stories from cleanliness drives, campaigns, and community-led change</p>
         </div>
         <div class="story-grid">
           <article class="story-card">
             <div class="story-image">
-              <img src="https://images.unsplash.com/photo-1719154717814-2a42aabf08c2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=800" alt="Anjali and her community crafting with recycled bottles" loading="lazy">
-              <div class="story-badge">Featured Artist</div>
+              <img src="https://media.licdn.com/dms/image/v2/D5612AQHmxTQqw9xYvg/article-cover_image-shrink_720_1280/B56ZuEQbUTGwAM-/0/1767450465810?e=1770854400&v=beta&t=eb1pzBYR5Th9-o4s47nUSQ9Xl3P7GdbicvqgzntTAdo" alt="Anjali and her community crafting with recycled bottles" loading="lazy">
+              <div class="story-badge">Cleanliness Drive</div>
             </div>
             <div class="story-content">
-              <h3>Anjali & Community</h3>
-              <p class="story-quote">"Every bottle we save becomes a piece of art that tells our story."</p>
+              <h3>Community Clean-Up Team</h3>
+                <p class="story-quote">
+                  "Real change begins on the ground — when communities come together to protect their surroundings."
+                </p>
               <div class="story-stats">
                 <div class="stat">
                   <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" fill="none">
                     <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"></path>
                     <circle cx="12" cy="10" r="3"></circle>
                   </svg>
-                  <span>Dehradun</span>
-                </div>
-                <div class="stat">
-                  <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" fill="none">
-                    <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-                  </svg>
-                  <span>500+ bottles saved</span>
+                  <span>Ganga Bhogpur Village</span>
                 </div>
               </div>
             </div>
@@ -203,25 +153,21 @@
 
           <article class="story-card">
             <div class="story-image">
-              <img src="https://images.unsplash.com/photo-1631273553464-7595e1a5b68d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=800" alt="Ravi working in his tire upcycling workshop" loading="lazy">
-              <div class="story-badge">Master Craftsman</div>
+              <img src="https://media.licdn.com/dms/image/v2/D5622AQFC5Or216rtVA/feedshare-shrink_2048_1536/B56Zt.ueC5KgAw-/0/1767357671192?e=1770854400&v=beta&t=rjgyyVs5-Z_RxhJgSutD33BD98KoRS_-_zAvWIUIgSY" alt="Ravi working in his tire upcycling workshop" loading="lazy">
+              <div class="story-badge">Awareness Campaign</div>
             </div>
             <div class="story-content">
-              <h3>Ravi's Workshop</h3>
-              <p class="story-quote">"From discarded tires to garden treasures - that's the magic we create."</p>
+              <h3>Waste Awareness Campaigns</h3>
+              <p class="story-quote">
+                "Awareness is the first step toward responsibility. Our campaigns turn learning into action."
+              </p>
               <div class="story-stats">
                 <div class="stat">
                   <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" fill="none">
                     <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"></path>
                     <circle cx="12" cy="10" r="3"></circle>
                   </svg>
-                  <span>Mussoorie</span>
-                </div>
-                <div class="stat">
-                  <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" fill="none">
-                    <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-                  </svg>
-                  <span>50 tires transformed</span>
+                  <span>Government Primary School, Gangdaspur</span>
                 </div>
               </div>
             </div>
@@ -229,37 +175,23 @@
 
           <article class="story-card">
             <div class="story-image">
-              <img src="https://images.unsplash.com/photo-1708578200684-3aa944b73237?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=800" alt="Students creating art from recycled materials" loading="lazy">
+              <img src="https://himvillageprahari.org/gallery/events%20(23).jpeg" alt="Students creating art from recycled materials" loading="lazy">
               <div class="story-badge">Youth Initiative</div>
             </div>
             <div class="story-content">
               <h3>Students for Earth</h3>
-              <p class="story-quote">"We're turning our school's waste into works of wonder."</p>
+              <p class="story-quote">“When students create with their own hands, learning turns into purpose and ideas turn into impact."</p>
               <div class="story-stats">
                 <div class="stat">
                   <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" fill="none">
                     <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"></path>
                     <circle cx="12" cy="10" r="3"></circle>
                   </svg>
-                  <span>Rishikesh</span>
-                </div>
-                <div class="stat">
-                  <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" fill="none">
-                    <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-                  </svg>
-                  <span>3 clean-ups funded</span>
+                  <span>Government Primary School</span>
                 </div>
               </div>
             </div>
           </article>
-        </div>
-        <div class="stories-footer">
-          <button class="btn ghost stories-btn">
-            <span>View All Stories</span>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M5 12h14m-7-7l7 7-7 7"/>
-            </svg>
-          </button>
         </div>
       </section>
 
@@ -288,24 +220,61 @@
             </div>
 
             <div class="donation-ctas">
-              <button id="donate-now" class="btn accent">
+              <button id="donate-now" class="btn accent" onclick="openDonationModal()">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
                 </svg>
                 <span>Donate Now</span>
-              </button>
-              <button id="learn-more" class="btn ghost">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <circle cx="12" cy="12" r="10"></circle>
-                  <path d="M12 16v-4M12 8h.01"></path>
-                </svg>
-                <span>Learn More About Impact</span>
               </button>
             </div>
           </div>
         </div>
       </section>
     </main>
+
+    <!-- Donation Modal -->
+        <div id="donation-modal" class="donation-modal hidden">
+          <div class="donation-modal-overlay" onclick="closeDonationModal()"></div>
+
+          <div class="donation-modal-content">
+            <button class="donation-close-btn" onclick="closeDonationModal()">✕</button>
+
+            <h2>Support Our Work</h2>
+            <p class="donation-subtext">
+              Choose an amount to support cleanliness drives and community initiatives.
+            </p>
+
+            <!-- Amount Options -->
+            <div class="donation-amounts">
+              <button class="amount-btn" onclick="selectAmount(10, this)">₹10</button>
+              <button class="amount-btn" onclick="selectAmount(50, this)">₹50</button>
+              <button class="amount-btn" onclick="selectAmount(100, this)">₹100</button>
+              <button class="amount-btn" onclick="selectAmount(500, this)">₹500</button>
+            </div>
+
+            <!-- Custom Amount -->
+            <div class="custom-amount">
+              <label for="customAmount">Custom Amount (₹)</label>
+              <input
+                type="number"
+                id="customAmount"
+                placeholder="Enter amount"
+                oninput="selectCustomAmount()"
+                min="1"
+              />
+            </div>
+            <p class="selected-amount">
+              Selected Amount: <strong id="selectedAmount">₹0</strong>
+            </p>
+
+
+            <!-- Proceed -->
+            <button class="btn accent donate-proceed-btn" onclick="proceedToDonate()">
+              <span class="btn-text">Proceed to Donate</span>
+            </button>
+          </div>
+        </div>
+
 
 
 {% endblock %}

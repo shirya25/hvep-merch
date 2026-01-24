@@ -1,4 +1,3 @@
-// Updated home.js with cart integration
 
 function getHomeProducts() {
   return window.MOCK_PRODUCTS ? window.MOCK_PRODUCTS.slice(0, 4) : [];
@@ -21,7 +20,6 @@ function renderProducts() {
     </div>
     <div class="card-footer">
       <div class="price">${formatCurrency(p.price)}</div>
-      <span class="btn">View</span>
     </div>
   </div>
 `;
@@ -172,7 +170,49 @@ function openProduct(productId) {
   window.location.href = `${link.href}?product=${productId}`;
 }
 
+function openDonationModal() {
+  document.getElementById('donation-modal')?.classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeDonationModal() {
+  document.getElementById('donation-modal')?.classList.add('hidden');
+  document.body.style.overflow = '';
+}
+
+let donationAmount = 0;
+
+function selectAmount(amount, btn) {
+  donationAmount = amount;
+
+  // Update text
+  document.getElementById("selectedAmount").textContent = `₹${amount}`;
+
+  // Fill custom input
+  const customInput = document.getElementById("customAmount");
+  if (customInput) customInput.value = amount;
+
+  // Active state handling
+  document.querySelectorAll(".amount-btn").forEach(b => b.classList.remove("active"));
+  if (btn) btn.classList.add("active");
+}
+
+function selectCustomAmount() {
+  const customInput = document.getElementById("customAmount");
+  const value = parseInt(customInput.value) || 0;
+
+  donationAmount = value;
+  document.getElementById("selectedAmount").textContent = `₹${value}`;
+
+  // Remove active state from preset buttons
+  document.querySelectorAll(".amount-btn").forEach(b => b.classList.remove("active"));
+}
+
+
+
 // Export functions
 window.handleAddToCart = handleAddToCart;
 window.handleWishlist = handleWishlist;
 window.openProduct = openProduct;
+window.openDonationModal = openDonationModal;
+window.closeDonationModal = closeDonationModal;
