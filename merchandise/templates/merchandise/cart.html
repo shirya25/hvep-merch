@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block title %}Shopping Cart - EcoShop{% endblock %}
+
+{% block extra_css %}
+  <!-- Fonts: Inter for UI, Playfair Display for headlines -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link rel="stylesheet" href="{% static 'merchandise/css/cart.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<body>
+  <div class="cart-wrapper">
+    <!-- Header -->
+    <div class="cart-header">
+      <h1 class="cart-title">
+        <i class="fas fa-shopping-cart"></i>
+        My Shopping Cart
+      </h1>
+      <p class="cart-subtitle">Review your sustainable choices</p>
+    </div>
+
+    <div class="cart-container">
+      <!-- Empty Cart State -->
+      <div id="empty-cart" class="empty-cart-state hidden">
+        <div class="empty-cart-icon">
+          <i class="fas fa-shopping-bag"></i>
+        </div>
+        <h2>Your cart is empty</h2>
+        <p>Looks like you haven't added any sustainable products yet.</p>
+        <a href="{% url 'merchandise:products' %}" class="btn-primary">
+          <i class="fas fa-leaf"></i> Browse Products
+        </a>
+      </div>
+
+      <!-- Cart with Items -->
+      <div id="cart-with-items" class="cart-content">
+        <!-- Cart Items Section -->
+        <div class="cart-items-section">
+          <div class="section-header">
+            <h2>Cart Items (<span id="total-items">0</span>)</h2>
+            <button class="clear-cart-btn" onclick="clearCart()">
+              <i class="fas fa-trash-alt"></i> Clear Cart
+            </button>
+          </div>
+
+          <div id="cart-items-list" class="cart-items-list">
+            <!-- Cart items will be dynamically inserted here -->
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="cart-actions">
+            <a href="{% url 'merchandise:products' %}" class="btn-outline">
+              <i class="fas fa-arrow-left"></i> Continue Shopping
+            </a>
+            <button onclick="proceedToCheckout()" class="checkout-btn">
+              <i class="fas fa-lock"></i> Proceed to Checkout
+            </button>
+          </div>
+        </div>
+
+        <!-- Eco Impact Card -->
+        <div class="eco-impact-sidebar">
+          <div class="eco-impact-card">
+            <div class="impact-header">
+              <i class="fas fa-leaf"></i>
+              <h4>Your Eco Impact</h4>
+            </div>
+            <p class="impact-text">
+              By choosing sustainable products, you're making a positive impact on our environment. Every purchase counts towards a greener future!
+            </p>
+            <div class="impact-stats">
+              <div class="stat-item">
+                <i class="fas fa-tree"></i>
+                <div>
+                  <strong><span id="carbon-saved">0</span>kg</strong>
+                  <span>CO₂ Reduced</span>
+                </div>
+              </div>
+              <div class="stat-item">
+                <i class="fas fa-recycle"></i>
+                <div>
+                  <strong><span id="items-count">0</span></strong>
+                  <span>Eco Products</span>
+                </div>
+              </div>
+            </div>
+            <div class="impact-badge">
+              <i class="fas fa-award"></i> Eco Warrior
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast hidden">
+    <i class="fas fa-check-circle"></i>
+    <span id="toast-message"></span>
+  </div>
+
+</body>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'merchandise/js/cart.js' %}"></script>
+{% endblock %}

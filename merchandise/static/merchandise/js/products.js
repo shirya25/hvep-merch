@@ -1,4 +1,3 @@
-
 const MOCK_PRODUCTS = [
   {
     id: 1,
@@ -391,14 +390,7 @@ function viewProductDetail(productId) {
 
 function handleProductDetailAddToCart() {
     if (selectedProduct && window.CartManager) {
-        const productForCart = {
-            id: selectedProduct.id,
-            name: selectedProduct.name,
-            price: selectedProduct.price,
-            image: selectedProduct.images?.[0] || '',
-            images: selectedProduct.images
-        };
-        window.CartManager.addItem(productForCart);
+        window.CartManager.addItem(selectedProduct);
     }
 }
 
@@ -420,9 +412,8 @@ function initProductApp() {
     const productId = params.get('product');
 
     if (productId) {
-    viewProductDetail(parseInt(productId));
+        viewProductDetail(parseInt(productId));
     }
-
 }
 
 window.initProductApp = initProductApp;

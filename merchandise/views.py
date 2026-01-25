@@ -18,6 +18,9 @@ def checkout(request):
 def thank(request):
     return render(request, "merchandise/thanks.html")
 
+def cart(request):
+    return render(request, "merchandise/cart.html")
+
 def signup_view(request):
     if request.method == "POST":
         full_name = request.POST['fullname']

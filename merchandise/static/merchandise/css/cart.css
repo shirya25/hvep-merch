@@ -1,0 +1,590 @@
+/* ========================================
+   Cart Page Styles - EcoShop
+   ======================================== */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e8f5e9 100%);
+  color: #2c3e50;
+  min-height: 100vh;
+  padding-bottom: 3rem;
+}
+
+.cart-wrapper {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+/* ========================================
+   Cart Header
+   ======================================== */
+
+.cart-header {
+  text-align: center;
+  margin-bottom: 3rem;
+  padding-bottom: 2rem;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.cart-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #2d5016;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.cart-title i {
+  color: #4caf50;
+  font-size: 2rem;
+}
+
+.cart-subtitle {
+  font-size: 1rem;
+  color: #666;
+  font-weight: 400;
+}
+
+/* ========================================
+   Empty Cart State
+   ======================================== */
+
+.empty-cart-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.empty-cart-icon {
+  font-size: 5rem;
+  color: #bdbdbd;
+  margin-bottom: 1.5rem;
+}
+
+.empty-cart-state h2 {
+  font-size: 1.8rem;
+  color: #333;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.empty-cart-state p {
+  font-size: 1rem;
+  color: #666;
+  margin-bottom: 2rem;
+}
+
+/* ========================================
+   Cart Content Layout
+   ======================================== */
+
+.cart-content {
+  display: grid;
+  grid-template-columns: 1fr 350px;
+  gap: 2rem;
+  align-items: start;
+}
+
+/* ========================================
+   Cart Items Section
+   ======================================== */
+
+.cart-items-section {
+  background: white;
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.section-header h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #2d5016;
+}
+
+.clear-cart-btn {
+  background: transparent;
+  border: 1px solid #e0e0e0;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: #d32f2f;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.clear-cart-btn:hover {
+  background: #ffebee;
+  border-color: #d32f2f;
+}
+
+/* ========================================
+   Cart Items List
+   ======================================== */
+
+.cart-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.cart-item {
+  display: flex;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  background: #f9f9f9;
+  border-radius: 12px;
+  border: 1px solid #e8e8e8;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.cart-item:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.item-image {
+  width: 120px;
+  height: 120px;
+  border-radius: 8px;
+  object-fit: cover;
+  background: white;
+  border: 1px solid #e0e0e0;
+}
+
+.item-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.item-name {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #333;
+  flex: 1;
+}
+
+.item-price {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #2d5016;
+  white-space: nowrap;
+}
+
+.item-rating {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.stars {
+  color: #ffc107;
+}
+
+.rating-count {
+  color: #666;
+}
+
+.item-eco-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: #e8f5e9;
+  color: #2e7d32;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  width: fit-content;
+}
+
+.item-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: auto;
+}
+
+.quantity-control {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 0.25rem;
+}
+
+.qty-btn {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: #f5f5f5;
+  color: #333;
+  border-radius: 6px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.qty-btn:hover {
+  background: #4caf50;
+  color: white;
+}
+
+.qty-btn:disabled {
+  background: #f0f0f0;
+  color: #ccc;
+  cursor: not-allowed;
+}
+
+.qty-display {
+  min-width: 40px;
+  text-align: center;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.remove-btn {
+  background: transparent;
+  border: none;
+  color: #d32f2f;
+  cursor: pointer;
+  font-size: 0.95rem;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.remove-btn:hover {
+  background: #ffebee;
+}
+
+/* ========================================
+   Cart Actions
+   ======================================== */
+
+.cart-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e0e0e0;
+}
+
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: white;
+  border: 2px solid #4caf50;
+  color: #4caf50;
+  text-decoration: none;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.btn-outline:hover {
+  background: #4caf50;
+  color: white;
+}
+
+.checkout-btn {
+  padding: 0.75rem 2rem;
+  background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.checkout-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(76, 175, 80, 0.4);
+}
+
+/* ========================================
+   Eco Impact Sidebar
+   ======================================== */
+
+.eco-impact-sidebar {
+  position: sticky;
+  top: 2rem;
+}
+
+.eco-impact-card {
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+  border-radius: 16px;
+  padding: 1.5rem;
+  border: 2px solid #4caf50;
+}
+
+.impact-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.impact-header i {
+  font-size: 1.5rem;
+  color: #2e7d32;
+}
+
+.impact-header h4 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #2d5016;
+}
+
+.impact-text {
+  font-size: 0.95rem;
+  color: #1b5e20;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+.impact-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: rgba(255, 255, 255, 0.5);
+  padding: 0.75rem;
+  border-radius: 8px;
+}
+
+.stat-item i {
+  font-size: 1.5rem;
+  color: #2e7d32;
+}
+
+.stat-item div {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-item strong {
+  font-size: 1.1rem;
+  color: #1b5e20;
+}
+
+.stat-item span {
+  font-size: 0.85rem;
+  color: #2e7d32;
+}
+
+.impact-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #2e7d32;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  width: 100%;
+  justify-content: center;
+}
+
+/* ========================================
+   Buttons
+   ======================================== */
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 2rem;
+  background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+  color: white;
+  text-decoration: none;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(76, 175, 80, 0.4);
+}
+
+/* ========================================
+   Toast Notification
+   ======================================== */
+
+.toast {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  background: #333;
+  color: white;
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  z-index: 1000;
+  animation: slideIn 0.3s ease;
+}
+
+.toast i {
+  color: #4caf50;
+  font-size: 1.2rem;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(400px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* ========================================
+   Utility Classes
+   ======================================== */
+
+.hidden {
+  display: none !important;
+}
+
+/* ========================================
+   Responsive Design
+   ======================================== */
+
+@media (max-width: 1024px) {
+  .cart-content {
+    grid-template-columns: 1fr;
+  }
+
+  .eco-impact-sidebar {
+    position: static;
+  }
+}
+
+@media (max-width: 768px) {
+  .cart-wrapper {
+    padding: 1rem;
+  }
+
+  .cart-title {
+    font-size: 2rem;
+  }
+
+  .cart-item {
+    flex-direction: column;
+  }
+
+  .item-image {
+    width: 100%;
+    height: 200px;
+  }
+
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .cart-actions {
+    flex-direction: column;
+  }
+
+  .btn-outline,
+  .checkout-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .cart-title {
+    font-size: 1.5rem;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .item-header {
+    flex-direction: column;
+  }
+
+  .item-actions {
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+  }
+
+  .quantity-control {
+    width: 100%;
+    justify-content: space-between;
+  }
+}

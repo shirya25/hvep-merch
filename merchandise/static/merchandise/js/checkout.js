@@ -1,4 +1,4 @@
-// Updated checkout.js - Loads items from cart
+// Updated checkout.js - Loads items from CartManager
 
 let currentStep = 1;
 const totalSteps = 5;
@@ -6,33 +6,44 @@ let cartItems = [];
 
 // Load cart items on page load
 function loadCartItems() {
+    // Try to get from CartManager first
     if (window.CartManager) {
         cartItems = window.CartManager.getItems();
-        
-        // If cart is empty, redirect to products page
-        if (cartItems.length === 0) {
-            alert('Your cart is empty. Please add items before checkout.');
-            // Uncomment to redirect:
-            // window.location.href = 'products.html';
-            return;
+    } else {
+        // Fallback to checkoutCart in localStorage
+        const saved = localStorage.getItem('checkoutCart');
+        if (saved) {
+            try {
+                cartItems = JSON.parse(saved);
+            } catch (e) {
+                cartItems = [];
+            }
         }
-        
-        renderCartItems();
-        updateSummary();
     }
+
+    // If cart is empty, redirect to products page
+    if (cartItems.length === 0) {
+        alert('Your cart is empty. Please add items before checkout.');
+        window.location.href = '../products/';
+        return;
+    }
+
+    renderCartItems();
+    updateSummary();
 }
 
 // Render cart items in step 1
 function renderCartItems() {
     const itemsList = document.querySelector('.items-list');
     if (!itemsList) return;
-    
+
     itemsList.innerHTML = cartItems.map((item, index) => `
         <li class="item-row">
-            <img src="${item.image || 'https://placehold.co/100x100/34D399/ffffff?text=Product'}" 
-                 alt="${item.name}" 
+            <img src="${item.image || 'https://placehold.co/100x100/34D399/ffffff?text=Product'}"
+                 alt="${item.name}"
                  class="item-image"
-                 style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px; margin-right: 12px;">
+                 style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px; margin-right: 12px;"
+                 onerror="this.src='https://placehold.co/100x100/34D399/ffffff?text=Product'">
             <span class="item-name">${item.name}</span>
             <div class="item-controls">
                 <div class="qty-controls">
@@ -53,46 +64,57 @@ function renderCartItems() {
 function updateCartItemQty(itemId, change) {
     const item = cartItems.find(i => i.id === itemId);
     if (!item) return;
-    
+
     const newQty = item.quantity + change;
-    
+
     if (newQty <= 0) {
         removeCartItem(itemId);
         return;
     }
-    
+
+    if (newQty > 10) return; // Max 10 items
+
+    item.quantity = newQty;
+
+    // Update in CartManager if available
     if (window.CartManager) {
         window.CartManager.updateQuantity(itemId, newQty);
         cartItems = window.CartManager.getItems();
-        
-        // Update display
-        const qtyDisplay = document.getElementById(`qty${itemId}`);
-        const priceDisplay = document.getElementById(`price${itemId}`);
-        
-        if (qtyDisplay) qtyDisplay.textContent = newQty;
-        if (priceDisplay) priceDisplay.textContent = `₹${(item.price * newQty).toFixed(2)}`;
-        
-        updateSummary();
+    } else {
+        localStorage.setItem('checkoutCart', JSON.stringify(cartItems));
     }
+
+    // Update display
+    const qtyDisplay = document.getElementById(`qty${itemId}`);
+    const priceDisplay = document.getElementById(`price${itemId}`);
+
+    if (qtyDisplay) qtyDisplay.textContent = newQty;
+    if (priceDisplay) priceDisplay.textContent = `₹${(item.price * newQty).toFixed(2)}`;
+
+    updateSummary();
 }
 
 // Remove item from cart
 function removeCartItem(itemId) {
-    if (window.CartManager) {
-        if (confirm('Remove this item from cart?')) {
+    if (confirm('Remove this item from cart?')) {
+        cartItems = cartItems.filter(i => i.id !== itemId);
+
+        // Update in CartManager if available
+        if (window.CartManager) {
             window.CartManager.removeItem(itemId);
             cartItems = window.CartManager.getItems();
-            
-            if (cartItems.length === 0) {
-                alert('Your cart is now empty.');
-                // Redirect or show empty state
-                window.location.href = 'products.html';
-                return;
-            }
-            
-            renderCartItems();
-            updateSummary();
+        } else {
+            localStorage.setItem('checkoutCart', JSON.stringify(cartItems));
         }
+
+        if (cartItems.length === 0) {
+            alert('Your cart is now empty.');
+            window.location.href = '../products/';
+            return;
+        }
+
+        renderCartItems();
+        updateSummary();
     }
 }
 
@@ -133,7 +155,7 @@ function validateContactInfo() {
         document.getElementById('phone').focus();
         return false;
     }
-    
+
     const phoneRegex = /^[0-9]{10}$/;
     if (!phoneRegex.test(phone)) {
         alert('Please enter a valid 10-digit phone number');
@@ -294,7 +316,7 @@ function updateSummary() {
     const donationEl = document.getElementById('summaryDonation');
     const totalEl = document.getElementById('summaryTotal');
     const finalTotalEl = document.getElementById('finalTotal');
-    
+
     if (subEl) subEl.textContent = `₹${subtotal.toFixed(2)}`;
     if (gstEl) gstEl.textContent = `₹${gst.toFixed(2)}`;
     if (donationEl) donationEl.textContent = `₹${donation.toFixed(2)}`;
@@ -304,12 +326,12 @@ function updateSummary() {
 
 function placeOrder() {
     const donationAmount = getDonationAmount();
-    
+
     let subtotal = 0;
     cartItems.forEach(item => {
         subtotal += item.price * item.quantity;
     });
-    
+
     const gst = subtotal * 0.03;
     const finalTotal = subtotal + gst + donationAmount;
 
@@ -317,9 +339,10 @@ function placeOrder() {
     if (window.CartManager) {
         window.CartManager.clear();
     }
+    localStorage.removeItem('checkoutCart');
 
     // Redirect to thank you page
-    window.location.href = "thanks.html";
+    window.location.href = "../thank/";
 }
 
 function attachDonationListeners() {

@@ -614,3 +614,129 @@ h1 {
 .remove-btn:hover {
     background: #d32f2f;
 }
+
+/* ========================================
+   CHECKOUT PAGE BUTTON FIXES
+   Add this CSS to your existing checkout.css file
+   ======================================== */
+
+/* Make quantity buttons always visible */
+.qty-btn {
+  background: #4caf50;
+  color: white;
+  border: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.qty-btn:hover {
+  background: #45a049;
+  transform: scale(1.1);
+}
+
+.qty-btn:active {
+  transform: scale(0.95);
+}
+
+.qty-btn:disabled {
+  background: #cccccc;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Ensure qty controls are visible */
+.qty-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #f5f5f5;
+  padding: 5px 10px;
+  border-radius: 8px;
+}
+
+.qty-display {
+  min-width: 30px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+/* Item controls styling */
+.item-controls {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.item-price {
+  font-weight: bold;
+  color: #2d5016;
+  font-size: 16px;
+  min-width: 80px;
+}
+
+/* Remove button styling */
+.remove-btn {
+  background: transparent;
+  border: 1px solid #d32f2f;
+  color: #d32f2f;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 14px;
+}
+
+.remove-btn:hover {
+  background: #d32f2f;
+  color: white;
+}
+
+.remove-btn i {
+  font-size: 14px;
+}
+
+/* Item row styling */
+.item-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px;
+  background: #f9f9f9;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  border: 1px solid #e0e0e0;
+}
+
+.item-name {
+  flex: 1;
+  font-weight: 600;
+  color: #333;
+  margin-left: 10px;
+}
+
+/* Make sure icons are visible */
+.qty-btn i,
+.remove-btn i {
+  pointer-events: none;
+}
+
+/* Responsive fixes */
+@media (max-width: 768px) {
+  .item-row {
+    flex-wrap: wrap;
+  }
+  
+  .item-controls {
+    width: 100%;
+    margin-top: 10px;
+    justify-content: space-between;
+  }
+}

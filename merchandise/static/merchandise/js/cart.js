@@ -1,283 +1,268 @@
-let currentStep = 1;
-const totalSteps = 5;
-let paymentScreenshot = null;
+// ========================================
+// Shopping Cart Manager - Integrated with Products
+// ========================================
 
-// Item data
-const items = {
-  1: { qty: 3, price: 30 },
-  2: { qty: 2, price: 25 },
-  3: { qty: 1, price: 18 }
-};
+const CartManager = (function() {
+  let cartItems = [];
+  const CART_KEY = 'ecoShopCart';
 
-function updateProgressBar() {
-  const progressFill = document.getElementById('progressFill');
-  const percentage = ((currentStep - 1) / (totalSteps - 1)) * 100;
-  progressFill.style.width = percentage + '%';
+  // Initialize cart
+  function init() {
+    loadFromStorage();
+    updateCartDisplay();
+    console.log('CartManager initialized with', cartItems.length, 'items');
+  }
 
-  document.querySelectorAll('.progress-step').forEach((step, index) => {
-    if (index < currentStep) {
-      step.classList.add('active');
+  // Load cart from localStorage
+  function loadFromStorage() {
+    const saved = localStorage.getItem(CART_KEY);
+    if (saved) {
+      try {
+        cartItems = JSON.parse(saved);
+      } catch (e) {
+        cartItems = [];
+      }
+    }
+  }
+
+  // Save cart to localStorage
+  function saveToStorage() {
+    localStorage.setItem(CART_KEY, JSON.stringify(cartItems));
+    console.log('Cart saved:', cartItems);
+  }
+
+  // Add item to cart
+  function addItem(product) {
+    console.log('Adding to cart:', product);
+    const existingItem = cartItems.find(item => item.id === product.id);
+
+    if (existingItem) {
+      existingItem.quantity += 1;
+      console.log('Increased quantity for:', product.name);
     } else {
-      step.classList.remove('active');
+      cartItems.push({
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        image: product.images?.[0] || product.image || '',
+        quantity: 1,
+        rating: product.rating || 0,
+        ecoRating: product.ecoScore ? 5 : 4
+      });
+      console.log('Added new item:', product.name);
     }
-  });
-}
 
-function validateContactInfo() {
-  const firstName = document.getElementById('firstName').value.trim();
-  const lastName = document.getElementById('lastName').value.trim();
-  const phone = document.getElementById('phone').value.trim();
-  const email = document.getElementById('email').value.trim();
-  const wp = document.getElementById('wp').value.trim();
-  const altphone = document.getElementById('altphone').value.trim();
-
-  // Check if all fields are filled
-  if (!firstName) {
-    alert('Please enter your first name');
-    document.getElementById('firstName').focus();
-    return false;
-  }
-  if (!lastName) {
-    alert('Please enter your last name');
-    document.getElementById('lastName').focus();
-    return false;
-  }
-  if (!phone) {
-    alert('Please enter your phone number');
-    document.getElementById('phone').focus();
-    return false;
-  }
-  
-  // Validate phone number (10 digits)
-  const phoneRegex = /^[0-9]{10}$/;
-  if (!phoneRegex.test(phone)) {
-    alert('Please enter a valid 10-digit phone number');
-    document.getElementById('phone').focus();
-    return false;
+    saveToStorage();
+    updateCartDisplay();
+    showToast(`${product.name} added to cart!`);
   }
 
-  if (!email) {
-    alert('Please enter your email address');
-    document.getElementById('email').focus();
-    return false;
+  // Remove item from cart
+  function removeItem(itemId) {
+    cartItems = cartItems.filter(item => item.id !== itemId);
+    saveToStorage();
+    updateCartDisplay();
   }
 
-  // Validate email format
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email)) {
-    alert('Please enter a valid email address');
-    document.getElementById('email').focus();
-    return false;
-  }
-
-  if (!wp) {
-    alert('Please enter your WhatsApp number');
-    document.getElementById('wp').focus();
-    return false;
-  }
-
-  // Validate WhatsApp number (10 digits)
-  if (!phoneRegex.test(wp)) {
-    alert('Please enter a valid 10-digit WhatsApp number');
-    document.getElementById('wp').focus();
-    return false;
-  }
-
-  if (!altphone) {
-    alert('Please enter your alternate phone number');
-    document.getElementById('altphone').focus();
-    return false;
-  }
-
-  // Validate alternate phone number (10 digits)
-  if (!phoneRegex.test(altphone)) {
-    alert('Please enter a valid 10-digit alternate phone number');
-    document.getElementById('altphone').focus();
-    return false;
-  }
-
-  return true;
-}
-
-function validateDeliveryInfo() {
-  const address1 = document.getElementById('address1').value.trim();
-  const address2 = document.getElementById('address2').value.trim();
-  const city = document.getElementById('city').value.trim();
-  const state = document.getElementById('state').value;
-  const pincode = document.getElementById('pincode').value.trim();
-
-  if (!address1) {
-    alert('Please enter your house/flat/street address');
-    document.getElementById('address1').focus();
-    return false;
-  }
-  if (!address2) {
-    alert('Please enter your locality/area');
-    document.getElementById('address2').focus();
-    return false;
-  }
-  if (!city) {
-    alert('Please enter your city/town');
-    document.getElementById('city').focus();
-    return false;
-  }
-  if (!state) {
-    alert('Please select your state');
-    document.getElementById('state').focus();
-    return false;
-  }
-  if (!pincode) {
-    alert('Please enter your pincode');
-    document.getElementById('pincode').focus();
-    return false;
-  }
-
-  // Validate pincode (6 digits)
-  const pincodeRegex = /^[0-9]{6}$/;
-  if (!pincodeRegex.test(pincode)) {
-    alert('Please enter a valid 6-digit pincode');
-    document.getElementById('pincode').focus();
-    return false;
-  }
-
-  return true;
-}
-
-function changeStep(direction) {
-  // Validate current step before moving forward
-  if (direction === 1) {
-    // VALIDATION TEMPORARILY DISABLED - Uncomment lines below to re-enable
-    /*
-    // Step 2 is now Contact Info - validate it
-    if (currentStep === 2 && !validateContactInfo()) {
-      return; // Don't proceed if validation fails
+  // Update item quantity
+  function updateQuantity(itemId, newQuantity) {
+    const item = cartItems.find(item => item.id === itemId);
+    if (item) {
+      item.quantity = Math.max(1, Math.min(10, newQuantity));
+      saveToStorage();
+      updateCartDisplay();
     }
-    // Step 3 is now Delivery - validate it
-    if (currentStep === 3 && !validateDeliveryInfo()) {
-      return; // Don't proceed if validation fails
+  }
+
+  // Clear entire cart
+  function clear() {
+    cartItems = [];
+    saveToStorage();
+    updateCartDisplay();
+  }
+
+  // Get all items
+  function getItems() {
+    return cartItems;
+  }
+
+  // Get cart count
+  function getCount() {
+    return cartItems.reduce((sum, item) => sum + item.quantity, 0);
+  }
+
+  // Update cart display (for cart page)
+  function updateCartDisplay() {
+    const emptyCart = document.getElementById('empty-cart');
+    const cartWithItems = document.getElementById('cart-with-items');
+    const cartItemsList = document.getElementById('cart-items-list');
+    const totalItemsSpan = document.getElementById('total-items');
+
+    // If elements don't exist, we're not on the cart page
+    if (!emptyCart || !cartWithItems) return;
+
+    if (cartItems.length === 0) {
+      emptyCart.classList.remove('hidden');
+      cartWithItems.classList.add('hidden');
+      return;
     }
-    */
+
+    emptyCart.classList.add('hidden');
+    cartWithItems.classList.remove('hidden');
+
+    const totalItems = getCount();
+    totalItemsSpan.textContent = totalItems;
+
+    cartItemsList.innerHTML = cartItems.map(item => `
+      <div class="cart-item" data-id="${item.id}">
+        <img src="${item.image || 'https://placehold.co/400x400/34D399/ffffff?text=Product'}"
+             alt="${item.name}"
+             class="item-image"
+             onerror="this.src='https://placehold.co/400x400/34D399/ffffff?text=Image+Missing'">
+        <div class="item-details">
+          <div class="item-header">
+            <h3 class="item-name">${item.name}</h3>
+            <span class="item-price">₹${(item.price * item.quantity).toLocaleString('en-IN')}</span>
+          </div>
+          <div class="item-rating">
+            <span class="stars">${generateStars(item.rating)}</span>
+          </div>
+          <div class="item-eco-badge">
+            <i class="fas fa-leaf"></i>
+            Eco Rating: ${item.ecoRating}/5
+          </div>
+          <div class="item-actions">
+            <div class="quantity-control">
+              <button class="qty-btn" onclick="CartManager.updateQuantity(${item.id}, ${item.quantity - 1})" ${item.quantity <= 1 ? 'disabled' : ''}>
+                <i class="fas fa-minus"></i>
+              </button>
+              <span class="qty-display">${item.quantity}</span>
+              <button class="qty-btn" onclick="CartManager.updateQuantity(${item.id}, ${item.quantity + 1})" ${item.quantity >= 10 ? 'disabled' : ''}>
+                <i class="fas fa-plus"></i>
+              </button>
+            </div>
+            <button class="remove-btn" onclick="CartManager.confirmRemove(${item.id}, '${item.name.replace(/'/g, "\\'")}')">
+              <i class="fas fa-trash-alt"></i> Remove
+            </button>
+          </div>
+        </div>
+      </div>
+    `).join('');
+
+    updateEcoImpact();
   }
 
-  const currentStepElement = document.querySelector(`.form-step[data-step="${currentStep}"]`);
-  currentStepElement.classList.remove('active');
+  // Generate star rating HTML
+  function generateStars(rating) {
+    const fullStars = Math.floor(rating);
+    const hasHalfStar = rating % 1 !== 0;
+    let stars = '';
 
-  currentStep += direction;
+    for (let i = 0; i < fullStars; i++) {
+      stars += '<i class="fas fa-star"></i>';
+    }
+    if (hasHalfStar) {
+      stars += '<i class="fas fa-star-half-alt"></i>';
+    }
+    const emptyStars = 5 - Math.ceil(rating);
+    for (let i = 0; i < emptyStars; i++) {
+      stars += '<i class="far fa-star"></i>';
+    }
 
-  if (currentStep < 1) currentStep = 1;
-  if (currentStep > totalSteps) currentStep = totalSteps;
-
-  const newStepElement = document.querySelector(`.form-step[data-step="${currentStep}"]`);
-  newStepElement.classList.add('active');
-
-  updateProgressBar();
-  updateButtons();
-
-  // Update summary if on review step (now step 4)
-  if (currentStep === 4) {
-    updateSummary();
-  }
-}
-
-function updateButtons() {
-  const prevBtn = document.getElementById('prevBtn');
-  const nextBtn = document.getElementById('nextBtn');
-
-  prevBtn.style.display = currentStep === 1 ? 'none' : 'inline-block';
-
-  if (currentStep === totalSteps) {
-    nextBtn.textContent = 'Place Order';
-    nextBtn.onclick = placeOrder;
-  } else {
-    nextBtn.textContent = 'Next';
-    nextBtn.onclick = () => changeStep(1);
-  }
-}
-
-function updateQty(itemId, change) {
-  items[itemId].qty = Math.max(0, items[itemId].qty + change);
-  document.getElementById(`qty${itemId}`).textContent = items[itemId].qty;
-  
-  const totalPrice = items[itemId].qty * items[itemId].price;
-  document.getElementById(`price${itemId}`).textContent = `₹${totalPrice}`;
-
-  // <-- IMPORTANT: update summary (so totals update live if user is on review or expects immediate update)
-  updateSummary();
-}
-
-function getDonationAmount() {
-  // Decide donation amount: customAmount takes precedence if > 0
-  const donationRadio = document.querySelector('input[name="donation"]:checked');
-  const customAmountRaw = document.getElementById('customAmount').value;
-  let donationAmount = 0;
-
-  if (customAmountRaw && parseFloat(customAmountRaw) > 0) {
-    donationAmount = parseFloat(customAmountRaw);
-  } else if (donationRadio) {
-    donationAmount = parseFloat(donationRadio.value) || 0;
-  }
-  return donationAmount;
-}
-
-function updateSummary() {
-  // 1) subtotal
-  let subtotal = 0;
-  for (let id in items) {
-    subtotal += items[id].qty * items[id].price;
+    return stars;
   }
 
-  // 2) gst
-  const gst = subtotal * 0.03;
+  // Update eco impact stats
+  function updateEcoImpact() {
+    const carbonSavedEl = document.getElementById('carbon-saved');
+    const itemsCountEl = document.getElementById('items-count');
 
-  // 3) donation
-  const donation = getDonationAmount();
+    if (carbonSavedEl) {
+      const carbonSaved = cartItems.reduce((sum, item) => sum + (item.quantity * 1.5), 0);
+      carbonSavedEl.textContent = carbonSaved.toFixed(1);
+    }
 
-  // 4) total
-  const total = subtotal + gst + donation;
-
-  // 5) write to DOM (use toFixed(2) for currency formatting)
-  const subEl = document.getElementById('summarySubtotal');
-  const gstEl = document.getElementById('summaryGST');
-  const donationEl = document.getElementById('summaryDonation');
-  const totalEl = document.getElementById('summaryTotal');
-  const finalTotalEl = document.getElementById('finalTotal');
-  
-  if (subEl) subEl.textContent = `₹${subtotal.toFixed(2)}`;
-  if (gstEl) gstEl.textContent = `₹${gst.toFixed(2)}`;
-  if (donationEl) donationEl.textContent = `₹${donation.toFixed(2)}`;
-  if (totalEl) totalEl.textContent = `₹${total.toFixed(2)}`;
-  if (finalTotalEl) finalTotalEl.textContent = `₹${total.toFixed(2)}`;
-}
-
-function placeOrder() {
-  // Get donation amount
-  const donationAmount = getDonationAmount();
-
-  // Calculate final total
-  let subtotal = 0;
-  for (let id in items) {
-    subtotal += items[id].qty * items[id].price;
+    if (itemsCountEl) {
+      itemsCountEl.textContent = getCount();
+    }
   }
-  const gst = subtotal * 0.03;
-  const finalTotal = subtotal + gst + donationAmount;
 
-  window.location.href = "../thank";
+  // Confirm remove item
+  function confirmRemove(itemId, itemName) {
+    if (confirm(`Remove "${itemName}" from cart?`)) {
+      removeItem(itemId);
+      showToast('Item removed from cart');
+    }
+  }
 
-}
+  return {
+    init,
+    addItem,
+    removeItem,
+    updateQuantity,
+    clear,
+    getItems,
+    getCount,
+    confirmRemove
+  };
+})();
 
-// Auto-update summary when donation inputs change
-function attachDonationListeners() {
-  document.querySelectorAll('input[name="donation"]').forEach(radio => {
-    radio.addEventListener('change', updateSummary);
-  });
-  const customAmountInput = document.getElementById('customAmount');
-  if (customAmountInput) {
-    customAmountInput.addEventListener('input', updateSummary);
+// Global functions for cart page
+function clearCart() {
+  if (CartManager.getItems().length === 0) return;
+
+  if (confirm('Are you sure you want to clear your entire cart?')) {
+    CartManager.clear();
+    showToast('Cart cleared');
   }
 }
 
-// Initialize
-updateProgressBar();
-updateButtons();
-attachDonationListeners();
-updateSummary(); // ensure UI shows correct totals from the start
+function proceedToCheckout() {
+  const items = CartManager.getItems();
+
+  if (items.length === 0) {
+    showToast('Your cart is empty!');
+    return;
+  }
+
+  // Save cart data for checkout page
+  localStorage.setItem('checkoutCart', JSON.stringify(items));
+
+  // Get the checkout URL from the template or use a default
+  window.location.href = '../checkout/';
+}
+
+// Show toast notification - creates element if it doesn't exist
+function showToast(message) {
+  let toast = document.getElementById('toast');
+  let toastMessage = document.getElementById('toast-message');
+
+  // Create toast if it doesn't exist
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'toast';
+    toast.className = 'toast hidden';
+    toast.innerHTML = `
+      <i class="fas fa-check-circle"></i>
+      <span id="toast-message"></span>
+    `;
+    document.body.appendChild(toast);
+    toastMessage = document.getElementById('toast-message');
+  }
+
+  toastMessage.textContent = message;
+  toast.classList.remove('hidden');
+
+  setTimeout(() => {
+    toast.classList.add('hidden');
+  }, 3000);
+}
+
+// Initialize cart on page load
+document.addEventListener('DOMContentLoaded', function() {
+  CartManager.init();
+});
+
+// Export CartManager globally
+window.CartManager = CartManager;
+window.showToast = showToast;

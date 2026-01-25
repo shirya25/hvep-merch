@@ -1,8 +1,5 @@
 {% extends "base.html" %}
 
-
-
-
 {% load static %}
 
 {% block title %}EcoShop Products{% endblock %}
@@ -15,8 +12,55 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="{% static 'merchandise/css/products.css' %}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
+  <!-- Toast notification styles -->
+  <style>
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: #333;
+      color: white;
+      padding: 1rem 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      z-index: 10000;
+      animation: slideIn 0.3s ease;
+      transition: opacity 0.3s ease;
+    }
+
+    .toast.hidden {
+      display: none;
+    }
+
+    .toast i {
+      color: #4caf50;
+      font-size: 1.2rem;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateX(400px);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .toast {
+        bottom: 1rem;
+        right: 1rem;
+        left: 1rem;
+      }
+    }
+  </style>
 {% endblock %}
 
 {% block content %}
@@ -111,11 +155,7 @@
 {% endblock %}
 
 {% block extra_js %}
+<!-- IMPORTANT: Load cart.js BEFORE products.js -->
 <script src="{% static 'merchandise/js/cart.js' %}"></script>
 <script src="{% static 'merchandise/js/products.js' %}"></script>
 {% endblock %}
-
-
-
-
-
