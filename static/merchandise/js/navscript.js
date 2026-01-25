@@ -74,18 +74,16 @@ function showCartNotification(message) {
 // Search Functionality
 const searchInput = document.getElementById('searchInput');
 const searchBtn = document.getElementById('searchBtn');
-const categorySelect = document.getElementById('categorySelect');
 
 function performSearch() {
     const searchTerm = searchInput.value.trim();
-    const category = categorySelect.value;
 
     if (searchTerm === '') {
         showNotification('Please enter a search term', 'warning');
         return;
     }
 
-    console.log('Searching for:', searchTerm, 'in category:', category);
+    console.log('Searching for:', searchTerm);
 
     // Here you would typically redirect to a search results page or filter products
     showNotification(`Searching for "${searchTerm}" in ${category}...`, 'info');

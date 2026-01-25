@@ -65,73 +65,6 @@ function formatCurrency(value) {
   return inrFormatter.format(value);
 }
 
-// Enhanced carousel with indicators
-function initHeroCarousel() {
-  const slides = Array.from(document.querySelectorAll('#hero .slide'));
-  if (!slides.length) return;
-  let idx = slides.findIndex((s) => s.classList.contains('active'));
-  if (idx < 0) idx = 0;
-  const total = slides.length;
-  const prevBtn = document.getElementById('hero-prev');
-  const nextBtn = document.getElementById('hero-next');
-  const indicators = Array.from(document.querySelectorAll('.indicator'));
-
-  function show(i, updateIndicators = true) {
-    i = ((i % total) + total) % total;
-    slides.forEach((s, si) => {
-      const active = si === i;
-      s.classList.toggle('active', active);
-      s.setAttribute('aria-hidden', active ? 'false' : 'true');
-    });
-    if (updateIndicators) {
-      indicators.forEach((ind, ii) => ind.classList.toggle('active', ii === i));
-    }
-    idx = i;
-  }
-
-  prevBtn && prevBtn.addEventListener('click', () => {
-    show(idx - 1);
-    restartAutoplay();
-  });
-  nextBtn && nextBtn.addEventListener('click', () => {
-    show(idx + 1);
-    restartAutoplay();
-  });
-
-  indicators.forEach((ind, i) => {
-    ind.addEventListener('click', () => {
-      show(i);
-      restartAutoplay();
-    });
-  });
-
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'ArrowLeft' || e.key === 'PageUp') { show(idx - 1); restartAutoplay(); }
-    if (e.key === 'ArrowRight' || e.key === 'PageDown') { show(idx + 1); restartAutoplay(); }
-  });
-
-  let autoplay = null;
-  function startAutoplay() {
-    stopAutoplay();
-    autoplay = setInterval(() => show(idx + 1), 5000);
-  }
-  function stopAutoplay() {
-    if (autoplay) { clearInterval(autoplay); autoplay = null; }
-  }
-  function restartAutoplay() { stopAutoplay(); startAutoplay(); }
-
-  const hero = document.getElementById('hero');
-  if (hero) {
-    hero.addEventListener('mouseenter', stopAutoplay);
-    hero.addEventListener('mouseleave', startAutoplay);
-    hero.addEventListener('focusin', stopAutoplay);
-    hero.addEventListener('focusout', startAutoplay);
-  }
-
-  show(idx);
-  startAutoplay();
-}
-
 // Header scroll behavior and mobile menu
 function initHeader() {
   const header = document.getElementById('site-header');
@@ -174,7 +107,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }, 100);
   
-  initHeroCarousel();
   initHeader();
   
   // Initialize cart if available
