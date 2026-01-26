@@ -15,13 +15,15 @@ function initCart() {
 // Update cart count display
 function updateCartDisplay() {
     const cartCountElement = document.getElementById('cartCount');
-    cartCountElement.textContent = cartCount;
+    if (cartCountElement) {
+        cartCountElement.textContent = cartCount;
 
-    // Add animation when count changes
-    cartCountElement.style.transform = 'scale(1.3)';
-    setTimeout(() => {
-        cartCountElement.style.transform = 'scale(1)';
-    }, 200);
+        // Add animation when count changes
+        cartCountElement.style.transform = 'scale(1.3)';
+        setTimeout(() => {
+            cartCountElement.style.transform = 'scale(1)';
+        }, 200);
+    }
 }
 
 // Add item to cart
@@ -78,7 +80,8 @@ const categorySelect = document.getElementById('categorySelect');
 
 function performSearch() {
     const searchTerm = searchInput.value.trim();
-    const category = categorySelect.value;
+    // Use optional chaining or check in case categorySelect isn't always present
+    const category = categorySelect ? categorySelect.value : 'All';
 
     if (searchTerm === '') {
         showNotification('Please enter a search term', 'warning');
@@ -87,44 +90,121 @@ function performSearch() {
 
     console.log('Searching for:', searchTerm, 'in category:', category);
 
-    // Here you would typically redirect to a search results page or filter products
-    showNotification(`Searching for "${searchTerm}" in ${category}...`, 'info');
+    // INTEGRATION: Check if we are on the products page
+    const isProductsPage = document.getElementById('product-listing') !== null;
 
-    // Example: Redirect to search page with query parameters
-    // window.location.href = `search.html?q=${encodeURIComponent(searchTerm)}&category=${encodeURIComponent(category)}`;
+    if (isProductsPage && window.updateSearchTerm && typeof window.updateSearchTerm === 'function') {
+        // Case A: User is already on the products page - Filter instantly
+        window.updateSearchTerm(searchInput);
+        showNotification(`Filtering for "${searchTerm}"...`, 'info');
+    } else {
+        // Case B: User is on Home or Login - Redirect to products page with query parameter
+        // Adjust the path below if your Django URL structure for products is different
+        window.location.href = '/merch/products/?q=' + encodeURIComponent(searchTerm);
+    }
+}
+
+// --- RECOMMENDATIONS LOGIC ---
+function showSearchRecommendations(query) {
+    // Remove any existing dropdown
+    let existingDropdown = document.querySelector('.search-recommendations');
+    if (existingDropdown) existingDropdown.remove();
+
+    if (!query || query.length < 1) return;
+
+    // Filter MOCK_PRODUCTS for matching names (Case-insensitive)
+    // MOCK_PRODUCTS is globally available if products.js is loaded
+    const products = window.MOCK_PRODUCTS || [];
+    const matches = products.filter(p => 
+        p.name.toLowerCase().includes(query.toLowerCase())
+    ).slice(0, 8); // Max 8 matches
+
+    if (matches.length === 0) return;
+
+    const dropdown = document.createElement('div');
+    dropdown.className = 'search-recommendations';
+    
+    matches.forEach(product => {
+        const item = document.createElement('div');
+        item.className = 'recommendation-item';
+        
+        // Highlight matching text
+        const regex = new RegExp(`(${query})`, 'gi');
+        const highlightedName = product.name.replace(regex, '<strong>$1</strong>');
+        
+        item.innerHTML = `<i class="fas fa-search"></i> <span>${highlightedName}</span>`;
+        
+        // IMPORTANT: Use mousedown to ensure the click registers before the input's blur event
+        item.addEventListener('mousedown', (e) => {
+            e.preventDefault(); // Prevent focus loss
+            window.location.href = '/merch/products/?q=' + encodeURIComponent(product.name);
+        });
+        dropdown.appendChild(item);
+    });
+
+    const searchBarContainer = document.querySelector('.search-bar');
+    if (searchBarContainer) {
+        searchBarContainer.appendChild(dropdown);
+    }
 }
 
 // Search on button click
-searchBtn.addEventListener('click', performSearch);
+if (searchBtn) {
+    searchBtn.addEventListener('click', performSearch);
+}
 
 // Search on Enter key
-searchInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-        performSearch();
-    }
-});
+if (searchInput) {
+    searchInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            performSearch();
+        }
+    });
 
-// Search suggestions (optional enhancement)
-searchInput.addEventListener('input', (e) => {
-    const value = e.target.value.trim();
-    if (value.length >= 3) {
-        // Here you could show search suggestions
-        console.log('Show suggestions for:', value);
-    }
-});
+    // Integrated real-time filtering and recommendations
+    searchInput.addEventListener('input', (e) => {
+        const isProductsPage = document.getElementById('product-listing') !== null;
+        const value = e.target.value.trim();
+
+        if (isProductsPage && window.updateSearchTerm && typeof window.updateSearchTerm === 'function') {
+            // Live filter the actual product cards on the products page
+            window.updateSearchTerm(e.target);
+        } else if (!isProductsPage) {
+            // Show recommendations dropdown on non-product pages (Home)
+            showSearchRecommendations(value);
+        }
+
+        if (value.length >= 3) {
+            // Here you could show search suggestions
+            console.log('Show suggestions for:', value);
+        }
+    });
+
+    // Close dropdown on blur (user clicks away)
+    searchInput.addEventListener('blur', () => {
+        setTimeout(() => {
+            const dropdown = document.querySelector('.search-recommendations');
+            if (dropdown) dropdown.remove();
+        }, 200);
+    });
+}
 
 // Cart Button Click
 const cartBtn = document.getElementById('cartBtn');
-cartBtn.addEventListener('click', () => {
-    console.log('Cart clicked. Items:', cart);
-    showNotification(`You have ${cartCount} item(s) in your cart`, 'info');
-});
+if (cartBtn) {
+    cartBtn.addEventListener('click', () => {
+        console.log('Cart clicked. Items:', cart);
+        showNotification(`You have ${cartCount} item(s) in your cart`, 'info');
+    });
+}
 
 // Home Button Click
 const homeBtn = document.getElementById('homeBtn');
 // Logo Click - Also redirect to home
 const logo = document.getElementById('logo');
-logo.style.cursor = 'pointer';
+if (logo) {
+    logo.style.cursor = 'pointer';
+}
 
 // Location Modal
 function createLocationModal() {
@@ -260,7 +340,10 @@ async function fetchLocationFromPincode(pincode) {
 
 function updateLocation(pincode, locationData) {
     const locationText = locationData ? `${locationData.city} ${pincode}` : `${pincode}`;
-    document.querySelector('.deliver-location').textContent = locationText;
+    const deliverLocation = document.querySelector('.deliver-location');
+    if (deliverLocation) {
+        deliverLocation.textContent = locationText;
+    }
 
     // Save to localStorage
     localStorage.setItem('hvep_location', pincode);
@@ -271,24 +354,91 @@ function updateLocation(pincode, locationData) {
 
 // Deliver To Click
 const deliverTo = document.querySelector('.deliver-to');
-deliverTo.addEventListener('click', () => {
-    createLocationModal();
-});
+if (deliverTo) {
+    deliverTo.addEventListener('click', () => {
+        createLocationModal();
+    });
+}
 
 // Load saved location
 function loadLocation() {
     const savedLocation = localStorage.getItem('hvep_location');
     const savedLocationData = localStorage.getItem('hvep_location_data');
+    const deliverLocation = document.querySelector('.deliver-location');
+
+    if (!deliverLocation) return;
 
     if (savedLocation && savedLocationData) {
         try {
             const locationData = JSON.parse(savedLocationData);
-            document.querySelector('.deliver-location').textContent = `${locationData.city} ${savedLocation}`;
+            deliverLocation.textContent = `${locationData.city} ${savedLocation}`;
         } catch (e) {
-            document.querySelector('.deliver-location').textContent = `${savedLocation}`;
+            deliverLocation.textContent = `${savedLocation}`;
         }
     } else if (savedLocation) {
-        document.querySelector('.deliver-location').textContent = `${savedLocation}`;
+        deliverLocation.textContent = `${savedLocation}`;
+    }
+}
+
+// --- Google Translate Initialization ---
+window.googleTranslateElementInit = function() {
+    new google.translate.TranslateElement({
+        pageLanguage: 'en',
+        includedLanguages: 'en,hi',
+        layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+        autoDisplay: false
+    }, 'google_translate_element');
+};
+
+// Programmatic trigger helper with cookie fallback
+function triggerGoogleTranslate(langCode) {
+    const isEnglish = langCode === 'en';
+    
+    // 1. Manage cookies: Set to /en/en for English to force restoration
+    const cookieValue = isEnglish ? `/en/en` : `/en/${langCode}`;
+    document.cookie = `googtrans=${cookieValue}; path=/`;
+    document.cookie = `googtrans=${cookieValue}; path=/; domain=${location.hostname}`;
+    
+    // 2. Try programmatic trigger on the combo box
+    let retries = 0;
+    const maxRetries = 15; 
+
+    const attempt = () => {
+        const translateCombo = document.querySelector('.goog-te-combo');
+        if (translateCombo) {
+            translateCombo.value = langCode;
+            translateCombo.dispatchEvent(new Event('change', { bubbles: true }));
+            return true;
+        }
+        return false;
+    };
+
+    if (!attempt()) {
+        const interval = setInterval(() => {
+            retries++;
+            if (attempt() || retries >= maxRetries) {
+                clearInterval(interval);
+            }
+        }, 300);
+    }
+
+    // Additional restoration logic for English
+    if (isEnglish) {
+        try {
+            const iframe = document.querySelector('.goog-te-banner-frame');
+            if (iframe && iframe.contentDocument) {
+                const restoreBtn = iframe.contentDocument.getElementById(':1.restore');
+                if (restoreBtn) restoreBtn.click();
+            }
+        } catch (e) {
+            // Catch cross-origin errors if frame is protected
+        }
+        
+        // Clean up cookies after a delay
+        setTimeout(() => {
+            document.cookie = "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+            document.cookie = `googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=${location.hostname}`;
+        }, 1500);
     }
 }
 
@@ -312,29 +462,26 @@ function createLanguageDropdown() {
                     <span class="lang-text">हिंदी (Hindi)</span>
                     <span class="lang-check">✓</span>
                 </button>
-                <button class="language-option" data-lang="MR">
-                    <span class="lang-icon">🇮🇳</span>
-                    <span class="lang-text">मराठी (Marathi)</span>
-                    <span class="lang-check">✓</span>
-                </button>
             </div>
         </div>
     `;
 
     document.body.appendChild(dropdown);
 
-    // Position dropdown
-    const languageItem = document.querySelectorAll('.nav-item')[1];
-    const rect = languageItem.getBoundingClientRect();
-    const dropdownContent = dropdown.querySelector('.dropdown-content');
-    dropdownContent.style.top = rect.bottom + 'px';
-    dropdownContent.style.left = rect.left + 'px';
+    // Position dropdown relative to Language Button
+    const languageBtn = document.getElementById('languageBtn');
+    if (languageBtn) {
+        const rect = languageBtn.getBoundingClientRect();
+        const dropdownContent = dropdown.querySelector('.dropdown-content');
+        dropdownContent.style.top = rect.bottom + 'px';
+        dropdownContent.style.left = rect.left + 'px';
 
-    // Show dropdown
-    setTimeout(() => {
-        dropdownContent.style.opacity = '1';
-        dropdownContent.style.transform = 'translateY(0)';
-    }, 10);
+        // Show dropdown
+        setTimeout(() => {
+            dropdownContent.style.opacity = '1';
+            dropdownContent.style.transform = 'translateY(0)';
+        }, 10);
+    }
 
     // Highlight current language
     const currentLang = localStorage.getItem('hvep_language') || 'EN';
@@ -353,6 +500,7 @@ function createLanguageDropdown() {
 
     // Close dropdown when clicking outside
     const closeDropdown = () => {
+        const dropdownContent = dropdown.querySelector('.dropdown-content');
         dropdownContent.style.opacity = '0';
         dropdownContent.style.transform = 'translateY(-10px)';
         setTimeout(() => dropdown.remove(), 200);
@@ -360,7 +508,8 @@ function createLanguageDropdown() {
 
     setTimeout(() => {
         document.addEventListener('click', function closeHandler(e) {
-            if (!dropdown.contains(e.target) && !languageItem.contains(e.target)) {
+            const languageBtn = document.getElementById('languageBtn');
+            if (!dropdown.contains(e.target) && !languageBtn.contains(e.target)) {
                 closeDropdown();
                 document.removeEventListener('click', closeHandler);
             }
@@ -369,43 +518,59 @@ function createLanguageDropdown() {
 }
 
 function updateLanguage(lang) {
-    const languageItem = document.querySelectorAll('.nav-item')[1];
-    languageItem.querySelector('.nav-item-title').textContent = lang;
-    localStorage.setItem('hvep_language', lang);
+    const languageBtn = document.getElementById('languageBtn');
+    if (languageBtn) {
+        languageBtn.querySelector('.nav-item-title').textContent = lang;
+        localStorage.setItem('hvep_language', lang);
 
-    const langNames = { EN: 'English', HI: 'Hindi', MR: 'Marathi' };
-    showNotification(`Language changed to ${langNames[lang]}`, 'success');
+        const langNames = { EN: 'English', HI: 'Hindi' };
+        
+        // Trigger Google Translate logic
+        const googleLangMap = { 'EN': 'en', 'HI': 'hi' };
+        triggerGoogleTranslate(googleLangMap[lang]);
+
+        showNotification(`Language changed to ${langNames[lang]}. Refreshing...`, 'success');
+
+        // AUTO REFRESH: Reload the page to ensure Google Translate applies the cookie correctly
+        setTimeout(() => {
+            window.location.reload();
+        }, 500);
+    }
 }
 
-// Language Item Click - Globe icon
-const languageItem = document.querySelectorAll('.nav-item')[1];
-languageItem.addEventListener('click', (e) => {
-    e.stopPropagation();
+// Language Item Click - Globe icon (FIXED TO USE ID)
+const languageBtn = document.getElementById('languageBtn');
+if (languageBtn) {
+    languageBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
 
-    // Remove any existing dropdown
-    const existing = document.querySelector('.language-dropdown');
-    if (existing) {
-        existing.remove();
-        return;
-    }
+        // Remove any existing dropdown
+        const existing = document.querySelector('.language-dropdown');
+        if (existing) {
+            existing.remove();
+            return;
+        }
 
-    createLanguageDropdown();
-});
+        createLanguageDropdown();
+    });
+}
 
-// Account Menu - Do nothing (user is not signed in)
-const accountItem = document.querySelectorAll('.nav-item')[2]; // Account & Lists
-accountItem.addEventListener('click', (e) => {
-    // Do nothing when not signed in
-    // In future, could show login modal or redirect to login page
-    console.log('Account clicked - user not signed in');
-});
+// Account Menu - Redirects to login page via HTML link
+const accountBtn = document.getElementById('accountBtn');
+if (accountBtn) {
+    accountBtn.addEventListener('click', (e) => {
+        // Log click but allow the HTML anchor link to handle redirection
+        console.log('Account clicked - Redirecting to Sign In');
+    });
+}
 
-// Returns & Orders
-const returnsItem = document.querySelectorAll('.nav-item')[3];
-returnsItem.addEventListener('click', () => {
-    showNotification('Please sign in to view orders', 'info');
-    // window.location.href = 'login.html';
-});
+// Returns & Orders (Note: Original code didn't have an ID, kept index-based or generic check)
+const returnsItem = document.querySelectorAll('.nav-item')[3]; 
+if (returnsItem) {
+    returnsItem.addEventListener('click', () => {
+        showNotification('Please sign in to view orders', 'info');
+    });
+}
 
 // Bottom Navigation Links
 const navLinks = document.querySelectorAll('.nav-link');
@@ -463,7 +628,7 @@ function showNotification(message, type = 'info') {
     }, 3000);
 }
 
-// Add CSS animations and styles
+// Add CSS animations and styles (STILL PRESENT)
 const style = document.createElement('style');
 style.textContent = `
     @keyframes slideIn {
@@ -504,6 +669,45 @@ style.textContent = `
     .nav-item:active, .nav-link:active {
         transform: scale(0.98);
     }
+
+    /* Google Translate Hiding Widget UI */
+    .goog-te-banner-frame.skiptranslate,
+    .goog-te-gadget-icon,
+    .goog-te-gadget-simple img { display: none !important; }
+    body { top: 0px !important; }
+    .goog-te-gadget { display: none !important; }
+    .skiptranslate { display: none !important; }
+    .goog-text-highlight { background: none !important; box-shadow: none !important; }
+
+    /* Search Recommendations Styling */
+    .search-bar { position: relative; overflow: visible !important; } /* Override overflow to show dropdown */
+    .search-recommendations {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 0 0 8px 8px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        z-index: 9999;
+        max-height: 400px;
+        overflow-y: auto;
+    }
+    .recommendation-item {
+        padding: 12px 15px;
+        cursor: pointer;
+        color: #333;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 14px;
+        border-bottom: 1px solid #f0f0f0;
+        transition: background 0.2s;
+    }
+    .recommendation-item:hover { background: #f0f7f2; }
+    .recommendation-item i { color: #888; font-size: 12px; }
+    .recommendation-item strong { color: #2f855a; font-weight: 700; }
 
     /* Location Modal */
     .location-modal {
@@ -816,10 +1020,12 @@ document.head.appendChild(style);
 
 // Mobile Menu Toggle (for responsive design)
 const allMenuBtn = document.querySelector('.all-menu');
-allMenuBtn.addEventListener('click', (e) => {
-    e.preventDefault();
-    showNotification('All categories menu', 'info');
-});
+if (allMenuBtn) {
+    allMenuBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        showNotification('All categories menu', 'info');
+    });
+}
 
 // Sticky Navbar on Scroll
 let lastScroll = 0;
@@ -827,22 +1033,26 @@ const navbar = document.querySelector('.navbar');
 
 window.addEventListener('scroll', () => {
     const currentScroll = window.pageYOffset;
-
-    if (currentScroll <= 0) {
-        navbar.style.boxShadow = 'none';
-    } else {
-        navbar.style.boxShadow = '0 2px 8px rgba(0,0,0,0.2)';
+    if (navbar) {
+        if (currentScroll <= 0) {
+            navbar.style.boxShadow = 'none';
+        } else {
+            navbar.style.boxShadow = '0 2px 8px rgba(0,0,0,0.2)';
+        }
     }
-
     lastScroll = currentScroll;
 });
 
 // Load saved language
 function loadLanguage() {
     const savedLang = localStorage.getItem('hvep_language');
-    if (savedLang) {
-        const languageItem = document.querySelectorAll('.nav-item')[1];
-        languageItem.querySelector('.nav-item-title').textContent = savedLang;
+    const languageBtn = document.getElementById('languageBtn');
+    if (savedLang && languageBtn) {
+        languageBtn.querySelector('.nav-item-title').textContent = savedLang;
+        
+        // Apply the cookie immediately and try programmatic trigger
+        const googleLangMap = { 'EN': 'en', 'HI': 'hi' };
+        triggerGoogleTranslate(googleLangMap[savedLang]);
     }
 }
 
@@ -850,11 +1060,24 @@ function loadLanguage() {
 document.addEventListener('DOMContentLoaded', () => {
     initCart();
     loadLocation();
+    
+    // Create translation container - Invisible but present in layout
+    // (Google Translate sometimes ignores completely hidden elements)
+    const translateDiv = document.createElement('div');
+    translateDiv.id = 'google_translate_element';
+    translateDiv.style.cssText = "position:absolute; top:-9999px; left:-9999px; width:1px; height:1px; overflow:hidden;";
+    document.body.appendChild(translateDiv);
+
+    // Load Google Translate script
+    const script = document.createElement('script');
+    script.src = "//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
+    document.head.appendChild(script);
+
     loadLanguage();
     console.log('HimVillage ePrahari Store initialized!');
 });
 
-// Example function to add products to cart (call this from product pages)
+// Example function to add products to cart
 window.addProductToCart = function(productId, productName, price) {
     addToCart({
         id: productId,

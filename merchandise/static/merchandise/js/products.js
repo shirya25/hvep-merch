@@ -110,7 +110,7 @@ const SORT_OPTIONS = {
 function getStarRatingHTML(rating) {
     const fullStars = '★'.repeat(rating);
     const emptyStars = '☆'.repeat(5 - rating);
-    return `<span class="star-rating">${fullStars}${emptyStars}</span>`;
+    return `<span class=\"star-rating\">${fullStars}${emptyStars}</span>`;
 }
 
 function toggleFilterModal(open) {
@@ -155,21 +155,20 @@ function updateSearchTerm(input) {
 
 function renderFilters() {
     const categoryContainer = document.getElementById('category-filter'); 
+    if (!categoryContainer) return;
     const categories = [...new Set(MOCK_PRODUCTS.map(p => p.category))];
-    let html = '<p class="filter-label">Product Category</p>';
+    let html = '<p class=\"filter-label\">Product Category</p>';
     
     categories.forEach(cat => {
         const isChecked = activeFilters.categories.includes(cat) ? 'checked' : '';
         html += `
             <label>
-                <input type="checkbox" value="${cat}" ${isChecked} onchange="updateCategoryFilter(this)"> 
+                <input type=\"checkbox\" value=\"${cat}\" ${isChecked} onchange=\"updateCategoryFilter(this)\"> 
                 ${cat}
             </label>
         `;
     });
-    if (categoryContainer) {
-        categoryContainer.innerHTML = html;
-    }
+    categoryContainer.innerHTML = html;
 }
 
 function toggleSortDropdown() {
@@ -212,7 +211,7 @@ function applyFilters() {
         activeFilters.maxPrice = parseInt(priceRangeInput.value);
     }
     
-    const ratingRadio = document.querySelector('#rating-filter input[name="rating"]:checked');
+    const ratingRadio = document.querySelector('#rating-filter input[name=\"rating\"]:checked');
     activeFilters.minRating = ratingRadio ? parseInt(ratingRadio.value) : 0;
 
     const maxPriceDisplay = document.getElementById('max-price-display');
@@ -260,24 +259,24 @@ function renderProductGrid(products) {
     if (!grid) return;
 
     if (products.length === 0) {
-        grid.innerHTML = '<div class="no-results p-5 text-center text-gray-500 col-span-full">No products match your current filters.</div>';
+        grid.innerHTML = '<div class=\"no-results p-5 text-center text-gray-500 col-span-full\">No products match your current search or filters.</div>';
         return;
     }
 
     grid.innerHTML = products.map(product => {
         const firstImage = product.images?.[0] || 'https://placehold.co/600x400/34D399/ffffff?text=Eco+Product';
         return `
-            <div class="product-card" onclick="viewProductDetail(${product.id})">
+            <div class=\"product-card\" onclick=\"viewProductDetail(${product.id})\">
                 <img 
-                    src="${firstImage}" 
-                    alt="${product.name}" 
-                    class="product-image"
-                    onerror="this.onerror=null;this.src='https://placehold.co/600x400/34D399/ffffff?text=Image+Missing';"
+                    src=\"${firstImage}\" 
+                    alt=\"${product.name}\" 
+                    class=\"product-image\"
+                    onerror=\"this.onerror=null;this.src='https://placehold.co/600x400/34D399/ffffff?text=Image+Missing';\"
                 >
-                <div class="card-info">
+                <div class=\"card-info\">
                     <h4>${product.name}</h4>
-                    <div class="flex justify-between items-center mt-2">
-                        <p class="card-price">₹${product.price.toLocaleString('en-IN')}</p>
+                    <div class=\"flex justify-between items-center mt-2\">
+                        <p class=\"card-price\">₹${product.price.toLocaleString('en-IN')}</p>
                         ${getStarRatingHTML(product.rating)}
                     </div>
                 </div>
@@ -312,22 +311,22 @@ function navigateImage(direction) {
 
 function renderEcoScore(score) {
     return `
-        <h3 class="text-xl font-semibold text-gray-800 mb-3">Sustainability Scorecard</h3>
-        <div class="eco-score-container">
-            <div class="score-item">
-                <i class="fas fa-smog"></i>
-                <div class="score-value text-red-500">${score.carbon}</div>
-                <div class="score-label">Carbon Footprint</div>
+        <h3 class=\"text-xl font-semibold text-gray-800 mb-3\">Sustainability Scorecard</h3>
+        <div class=\"eco-score-container\">
+            <div class=\"score-item\">
+                <i class=\"fas fa-smog\"></i>
+                <div class=\"score-value text-red-500\">${score.carbon}</div>
+                <div class=\"score-label\">Carbon Footprint</div>
             </div>
-            <div class="score-item">
-                <i class="fas fa-tint"></i>
-                <div class="score-value text-blue-500">${score.water}</div>
-                <div class="score-label">Water Usage</div>
+            <div class=\"score-item\">
+                <i class=\"fas fa-tint\"></i>
+                <div class=\"score-value text-blue-500\">${score.water}</div>
+                <div class=\"score-label\">Water Usage</div>
             </div>
-            <div class="score-item">
-                <i class="fas fa-recycle"></i>
-                <div class="score-value text-green-500">${score.waste}</div>
-                <div class="score-label">Waste Reduction</div>
+            <div class=\"score-item\">
+                <i class=\"fas fa-recycle\"></i>
+                <div class=\"score-value text-green-500\">${score.waste}</div>
+                <div class=\"score-label\">Waste Reduction</div>
             </div>
         </div>
     `;
@@ -343,43 +342,43 @@ function viewProductDetail(productId) {
     if (!container) return;
 
     container.innerHTML = `
-        <div class="detail-layout">
-            <div class="gallery-col">
-                <div class="image-carousel-wrapper">
-                    <img id="main-product-image" 
-                        src="${selectedProduct.images?.[0] || 'https://placehold.co/800x800/10B981/ffffff?text=Product+Image'}" 
-                        alt="${selectedProduct.name}" 
-                        class="detail-image"
+        <div class=\"detail-layout\">
+            <div class=\"gallery-col\">
+                <div class=\"image-carousel-wrapper\">
+                    <img id=\"main-product-image\" 
+                        src=\"${selectedProduct.images?.[0] || 'https://placehold.co/800x800/10B981/ffffff?text=Product+Image'}\" 
+                        alt=\"${selectedProduct.name}\" 
+                        class=\"detail-image\"
                     >
-                    <button class="gallery-button prev" onclick="navigateImage(-1)">
-                        <i class="fas fa-chevron-left"></i>
+                    <button class=\"gallery-button prev\" onclick=\"navigateImage(-1)\">
+                        <i class=\"fas fa-chevron-left\"></i>
                     </button>
-                    <button class="gallery-button next" onclick="navigateImage(1)">
-                        <i class="fas fa-chevron-right"></i>
+                    <button class=\"gallery-button next\" onclick=\"navigateImage(1)\">
+                        <i class=\"fas fa-chevron-right\"></i>
                     </button>
                 </div>
             </div>
 
-            <div class="detail-info">
-                <div class="product-rating">
+            <div class=\"detail-info\">
+                <div class=\"product-rating\">
                     ${getStarRatingHTML(selectedProduct.rating)} (${selectedProduct.rating}.0 / 5)
                 </div>
                 <h2>${selectedProduct.name}</h2>
-                <p class="detail-price">₹${selectedProduct.price.toLocaleString('en-IN')}</p>
+                <p class=\"detail-price\">₹${selectedProduct.price.toLocaleString('en-IN')}</p>
 
-                <div class="eco-score-card">
+                <div class=\"eco-score-card\">
                     ${renderEcoScore(selectedProduct.ecoScore)}
                 </div>
 
-                <div class="eco-story-box eco-story-section">
-                    <h3><i class="fas fa-seedling"></i> The Story Behind It</h3>
-                    <p class="story-text text-gray-700">
+                <div class=\"eco-story-box eco-story-section\">
+                    <h3><i class=\"fas fa-seedling\"></i> The Story Behind It</h3>
+                    <p class=\"story-text text-gray-700\">
                         Made with ${selectedProduct.material}. ${selectedProduct.impact}.
                     </p>
                 </div>
 
-                <button class="add-to-cart-btn" onclick="handleProductDetailAddToCart()">
-                    <i class="fas fa-cart-plus"></i> Add to Cart
+                <button class=\"add-to-cart-btn\" onclick=\"handleProductDetailAddToCart()\">
+                    <i class=\"fas fa-cart-plus\"></i> Add to Cart
                 </button>
             </div>
         </div>
@@ -394,9 +393,21 @@ function handleProductDetailAddToCart() {
     }
 }
 
+// INTEGRATION: Added URL search parameter handling to initialization
 function initProductApp() {
+    const params = new URLSearchParams(window.location.search);
+    const searchQuery = params.get('q');
+    
+    if (searchQuery) {
+        activeFilters.searchTerm = searchQuery.toLowerCase();
+        // Also update the navbar input if it exists to match the current search
+        const navbarSearch = document.getElementById('searchInput');
+        if (navbarSearch) navbarSearch.value = searchQuery;
+    }
+
     renderFilters();
     applyFilters();
+    
     const listingView = document.getElementById('product-listing');
     const detailView = document.getElementById('product-detail');
     
@@ -408,9 +419,8 @@ function initProductApp() {
         window.CartManager.init();
     }
 
-    const params = new URLSearchParams(window.location.search);
+    // Direct product link handling
     const productId = params.get('product');
-
     if (productId) {
         viewProductDetail(parseInt(productId));
     }

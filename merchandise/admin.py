@@ -1,5 +1,6 @@
 from django.contrib import admin
 from .models import Product, Category
+admin.site.site_url = "/merch/"
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):

@@ -75,47 +75,64 @@ body {
     font-weight: bold;
 }
 
-/* Search Bar */
-.search-bar {
+/* Search Bar - Specific Styles to prevent overrides from login/signup CSS */
+.navbar .search-bar {
     display: flex;
     flex: 1;
     max-width: 800px;
     height: 42px;
+    background-color: white;
+    border-radius: 4px; 
+    overflow: hidden;
+    border: none !important;
 }
 
-.search-dropdown {
-    background-color: #e8f5e9;
-    border: none;
-    padding: 0 10px;
-    border-radius: 4px 0 0 4px;
-    cursor: pointer;
-    color: #2d5016;
-    font-size: 13px;
-    font-weight: 600;
+/* Using ID #searchInput for maximum specificity to override userlogin.css */
+#searchInput {
+    flex: 1 !important;
+    border: none !important;
+    padding: 0 15px !important;
+    font-size: 14px !important;
+    outline: none !important;
+    border-radius: 0 !important; /* Force removal of 8px radius from login CSS */
+    height: 100% !important;
+    margin: 0 !important;
+    background: white !important;
+    color: #333 !important;
+    box-shadow: none !important;
+    width: auto !important;
 }
 
-.search-input {
-    flex: 1;
-    border: none;
-    padding: 0 15px;
-    font-size: 14px;
-    outline: none;
+/* Reset Placeholder Color explicitly using ID specificity */
+#searchInput::placeholder {
+    color: #999 !important; /* Resetting back to neutral grey */
+    opacity: 1 !important;
 }
 
-.search-button {
+/* Ensure focus state doesn't trigger login page styles or shadows */
+#searchInput:focus {
+    background: white !important;
+    border: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+.navbar .search-button {
     background-color: #8bc34a;
     border: none;
     padding: 0 25px;
     cursor: pointer;
-    /* border-radius: 0 4px 4px 0; */
     transition: background-color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.search-button:hover {
+.navbar .search-button:hover {
     background-color: #7cb342;
 }
 
-.search-button i {
+.navbar .search-button i {
     font-size: 18px;
     color: #1b5e20;
 }
