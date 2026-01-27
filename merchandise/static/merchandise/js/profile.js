@@ -12,25 +12,31 @@ document.addEventListener('DOMContentLoaded', () => {
 function initializeProfilePage() {
     setupMenuNavigation();
     setupFormValidation();
+    setupPasswordValidation();
     setupAutoSaveIndicator();
     animateStatsOnScroll();
-    
+
     // Initial wishlist count update
     updateWishlistCount();
+
+    // Ensure CartManager is initialized
+    if (window.CartManager && typeof window.CartManager.init === 'function') {
+        window.CartManager.init();
+    }
 }
 
 // Menu Navigation - Enhanced to handle section switching
 function setupMenuNavigation() {
     const menuItems = document.querySelectorAll('.menu li:not(.logout)');
     const sections = document.querySelectorAll('.content-section');
-    
+
     menuItems.forEach(item => {
         item.addEventListener('click', function() {
             // Remove active class from all items
             menuItems.forEach(i => i.classList.remove('active'));
             // Add active class to clicked item
             this.classList.add('active');
-            
+
             // Logic to switch sections based on data-section attribute
             const sectionId = this.getAttribute('data-section');
             if (sectionId) {
@@ -38,7 +44,7 @@ function setupMenuNavigation() {
                 const targetSection = document.getElementById(sectionId);
                 if (targetSection) {
                     targetSection.classList.remove('hidden');
-                    
+
                     // If switching to wishlist, render items
                     if (sectionId === 'my-wishlist') {
                         renderWishlistItems();
@@ -70,11 +76,11 @@ function renderWishlistItems() {
         // Hide empty state if there are products - using style.display to bypass CSS specificity issues
         emptyState.style.display = 'none';
         emptyState.classList.add('hidden');
-        
+
         // Render items to the grid
         grid.innerHTML = items.map(p => {
-            const productImage = (p.images && p.images.length > 0) 
-                ? p.images[0] 
+            const productImage = (p.images && p.images.length > 0)
+                ? p.images[0]
                 : 'https://placehold.co/400x400/10B981/ffffff?text=Product';
 
             return `
@@ -86,9 +92,11 @@ function renderWishlistItems() {
                     <div class="wishlist-details">
                         <h4 style="margin: 0 0 8px; font-size: 1.1rem; color: #1e293b;">${p.name}</h4>
                         <p style="color: #1b8f4b; font-weight: 700; font-size: 1.2rem; margin-bottom: 12px;">₹${p.price}</p>
-                        <button onclick="handleProfileAddToCart(${p.id})" 
-                            style="width: 100%; padding: 10px; background: #1b8f4b; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: opacity 0.2s;">
-                            Add to Cart
+                        <button onclick="handleProfileAddToCart(${p.id})"
+                            style="width: 100%; padding: 10px; background: #1b8f4b; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: background 0.2s;"
+                            onmouseover="this.style.background='#157a3f'"
+                            onmouseout="this.style.background='#1b8f4b'">
+                            <i class="fas fa-shopping-cart"></i> Add to Cart
                         </button>
                     </div>
                 </div>
@@ -124,11 +132,47 @@ function updateWishlistCount() {
     }
 }
 
-// Handle cart addition from within profile
+// Handle cart addition from within profile - IMPROVED VERSION
 window.handleProfileAddToCart = function(productId) {
-    const product = (window.MOCK_PRODUCTS || []).find(p => p.id === productId);
+    console.log('Adding product to cart:', productId);
+
+    // Try to get product from wishlist items first
+    let product = null;
+
+    if (window.WishlistManager) {
+        const wishlistItems = window.WishlistManager.getItems();
+        product = wishlistItems.find(p => p.id === productId);
+    }
+
+    // Fallback to MOCK_PRODUCTS if available
+    if (!product && window.MOCK_PRODUCTS) {
+        product = window.MOCK_PRODUCTS.find(p => p.id === productId);
+    }
+
     if (product && window.CartManager) {
+        // Ensure CartManager is initialized
+        if (typeof window.CartManager.init === 'function') {
+            window.CartManager.init();
+        }
+
+        // Add item to cart
         window.CartManager.addItem(product);
+
+        // Show success notification
+        if (window.showToast) {
+            window.showToast(`${product.name} added to cart!`, 'success');
+        } else {
+            showNotification(`${product.name} added to cart!`, 'success');
+        }
+
+        console.log('Product added to cart successfully');
+    } else {
+        console.error('Product not found or CartManager not available');
+        if (window.showToast) {
+            window.showToast('Failed to add item to cart', 'error');
+        } else {
+            showNotification('Failed to add item to cart', 'error');
+        }
     }
 };
 
@@ -136,7 +180,7 @@ window.handleProfileAddToCart = function(productId) {
 function confirmLogout() {
     const modal = document.getElementById('logoutModal');
     if (modal) modal.classList.add('active');
-    
+
     // Prevent body scroll when modal is open
     document.body.style.overflow = 'hidden';
 }
@@ -144,7 +188,7 @@ function confirmLogout() {
 function closeLogoutModal() {
     const modal = document.getElementById('logoutModal');
     if (modal) modal.classList.remove('active');
-    
+
     // Restore body scroll
     document.body.style.overflow = 'auto';
 }
@@ -168,25 +212,25 @@ document.addEventListener('keydown', function(event) {
 function setupFormValidation() {
     const form = document.querySelector('.profile-form');
     if (!form) return;
-    
+
     const inputs = form.querySelectorAll('input:not([disabled]), select');
-    
+
     inputs.forEach(input => {
         // Real-time validation on blur
         input.addEventListener('blur', function() {
             validateField(this);
         });
-        
+
         // Remove error styling on focus
         input.addEventListener('focus', function() {
             this.classList.remove('error');
             removeFieldError(this);
         });
     });
-    
+
     // Form submit validation
     form.addEventListener('submit', function(e) {
-        // Only prevent default if we want to handle via JS/AJAX, 
+        // Only prevent default if we want to handle via JS/AJAX,
         // otherwise let standard POST happen after validation.
         let isValid = true;
         inputs.forEach(input => {
@@ -194,7 +238,7 @@ function setupFormValidation() {
                 isValid = false;
             }
         });
-        
+
         if (isValid) {
             showSaveLoading();
         } else {
@@ -204,20 +248,122 @@ function setupFormValidation() {
     });
 }
 
+// Password Change Form Validation
+function setupPasswordValidation() {
+    const passwordForm = document.getElementById('password-change-form');
+    if (!passwordForm) return;
+
+    const oldPassword = document.getElementById('old_password');
+    const newPassword1 = document.getElementById('new_password1');
+    const newPassword2 = document.getElementById('new_password2');
+
+    // Real-time password strength validation
+    if (newPassword1) {
+        newPassword1.addEventListener('input', function() {
+            validatePasswordStrength(this);
+        });
+    }
+
+    // Confirm password match validation
+    if (newPassword2) {
+        newPassword2.addEventListener('input', function() {
+            validatePasswordMatch(newPassword1, this);
+        });
+    }
+
+    // Form submission validation
+    passwordForm.addEventListener('submit', function(e) {
+        let isValid = true;
+
+        // Validate old password
+        if (!oldPassword.value.trim()) {
+            showFieldError(oldPassword, 'Current password is required');
+            isValid = false;
+        }
+
+        // Validate new password
+        if (!validatePasswordStrength(newPassword1)) {
+            isValid = false;
+        }
+
+        // Validate password match
+        if (!validatePasswordMatch(newPassword1, newPassword2)) {
+            isValid = false;
+        }
+
+        if (!isValid) {
+            e.preventDefault();
+            showNotification('Please fix the errors before submitting', 'error');
+        } else {
+            showSaveLoading('.password-form .save-btn');
+        }
+    });
+}
+
+// Validate password strength
+function validatePasswordStrength(passwordField) {
+    const password = passwordField.value;
+    const errors = [];
+
+    if (password.length < 8) {
+        errors.push('Password must be at least 8 characters long');
+    }
+
+    if (!/[A-Z]/.test(password)) {
+        errors.push('Password must contain at least one uppercase letter');
+    }
+
+    if (!/[a-z]/.test(password)) {
+        errors.push('Password must contain at least one lowercase letter');
+    }
+
+    if (!/[0-9]/.test(password)) {
+        errors.push('Password must contain at least one number');
+    }
+
+    if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+        errors.push('Password must contain at least one special character');
+    }
+
+    if (errors.length > 0) {
+        showFieldError(passwordField, errors[0]);
+        return false;
+    } else {
+        removeFieldError(passwordField);
+        passwordField.classList.remove('error');
+        return true;
+    }
+}
+
+// Validate password match
+function validatePasswordMatch(password1Field, password2Field) {
+    const password1 = password1Field.value;
+    const password2 = password2Field.value;
+
+    if (password2 && password1 !== password2) {
+        showFieldError(password2Field, 'Passwords do not match');
+        return false;
+    } else {
+        removeFieldError(password2Field);
+        password2Field.classList.remove('error');
+        return true;
+    }
+}
+
 // Validate individual field
 function validateField(field) {
     const value = field.value.trim();
     const fieldName = field.name;
-    
+
     // Skip disabled fields
     if (field.disabled) return true;
-    
+
     // Check required fields
     if (field.required && !value) {
         showFieldError(field, 'This field is required');
         return false;
     }
-    
+
     // Specific validation based on field type
     switch(fieldName) {
         case 'full_name':
@@ -230,14 +376,14 @@ function validateField(field) {
                 return false;
             }
             break;
-            
+
         case 'mobile':
             if (value && !/^[\d\s\+\-\(\)]+$/.test(value)) {
                 showFieldError(field, 'Please enter a valid mobile number');
                 return false;
             }
             break;
-            
+
         case 'postal_code':
             if (value && !/^\d{6}$/.test(value)) {
                 showFieldError(field, 'Please enter a valid 6-digit PIN code');
@@ -245,7 +391,7 @@ function validateField(field) {
             }
             break;
     }
-    
+
     // If validation passes
     field.classList.remove('error');
     removeFieldError(field);
@@ -255,15 +401,15 @@ function validateField(field) {
 // Show field error
 function showFieldError(field, message) {
     field.classList.add('error');
-    
+
     // Remove existing error message
     removeFieldError(field);
-    
+
     // Create and append error message
     const errorDiv = document.createElement('div');
     errorDiv.className = 'field-error';
     errorDiv.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${message}`;
-    
+
     field.parentElement.appendChild(errorDiv);
 }
 
@@ -276,8 +422,8 @@ function removeFieldError(field) {
 }
 
 // Show save loading state
-function showSaveLoading() {
-    const saveBtn = document.querySelector('.save-btn');
+function showSaveLoading(selector = '.save-btn') {
+    const saveBtn = document.querySelector(selector);
     if (!saveBtn) return;
     
     saveBtn.disabled = true;

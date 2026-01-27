@@ -1,11 +1,12 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from .models import Profile
 from .forms import UserLoginForm
 from django.db import transaction
+import re
 
 
 def home(request):
@@ -155,5 +156,64 @@ def update_profile(request):
             messages.success(request, "Profile updated successfully!")
         except Exception as e:
             messages.error(request, f"Error updating profile: {str(e)}")
+
+    return redirect('merchandise:profile')
+
+
+@login_required(login_url='merchandise:login')
+def change_password(request):
+    """Handle password change"""
+    if request.method == 'POST':
+        old_password = request.POST.get('old_password', '')
+        new_password1 = request.POST.get('new_password1', '')
+        new_password2 = request.POST.get('new_password2', '')
+
+        # Validate old password
+        if not request.user.check_password(old_password):
+            messages.error(request, "Current password is incorrect")
+            return redirect('merchandise:profile')
+
+        # Validate new passwords match
+        if new_password1 != new_password2:
+            messages.error(request, "New passwords do not match")
+            return redirect('merchandise:profile')
+
+        # Validate password strength
+        if len(new_password1) < 8:
+            messages.error(request, "Password must be at least 8 characters long")
+            return redirect('merchandise:profile')
+
+        if not re.search(r'[A-Z]', new_password1):
+            messages.error(request, "Password must contain at least one uppercase letter")
+            return redirect('merchandise:profile')
+
+        if not re.search(r'[a-z]', new_password1):
+            messages.error(request, "Password must contain at least one lowercase letter")
+            return redirect('merchandise:profile')
+
+        if not re.search(r'[0-9]', new_password1):
+            messages.error(request, "Password must contain at least one number")
+            return redirect('merchandise:profile')
+
+        if not re.search(r'[!@#$%^&*(),.?":{}|<>]', new_password1):
+            messages.error(request, "Password must contain at least one special character")
+            return redirect('merchandise:profile')
+
+        # Validate new password is different from old
+        if old_password == new_password1:
+            messages.error(request, "New password must be different from current password")
+            return redirect('merchandise:profile')
+
+        try:
+            # Change the password
+            request.user.set_password(new_password1)
+            request.user.save()
+
+            # Important: Update session to prevent logout
+            update_session_auth_hash(request, request.user)
+
+            messages.success(request, "Password changed successfully!")
+        except Exception as e:
+            messages.error(request, f"Error changing password: {str(e)}")
 
     return redirect('merchandise:profile')
