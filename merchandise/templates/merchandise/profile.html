@@ -7,6 +7,45 @@
 {% block extra_css %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 <link rel="stylesheet" href="{% static 'merchandise/css/profile.css' %}">
+<style>
+    /* Section switching */
+    .content-section.hidden { display: none; }
+    
+    /* Wishlist Grid Styling */
+    .wishlist-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 20px;
+        margin-top: 20px;
+    }
+    .wishlist-item-card {
+        border: 1px solid #e2e8f0;
+        padding: 15px;
+        border-radius: 12px;
+        position: relative;
+        background: white;
+        box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        text-align: center;
+    }
+    .remove-wishlist {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        border: none;
+        background: #fee2e2;
+        color: #dc2626;
+        border-radius: 50%;
+        width: 28px;
+        height: 28px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+    }
+    .empty-state { text-align: center; padding: 40px; color: #64748b; }
+    .empty-state i { font-size: 48px; margin-bottom: 16px; display: block; }
+</style>
 {% endblock %}
 
 {% block content %}
@@ -52,27 +91,27 @@
             </div>
 
             <ul class="menu">
-                <li class="active">
+                <li class="active" data-section="profile-info">
                     <i class="fas fa-user"></i>
                     <span>Profile Information</span>
                 </li>
-                <li>
+                <li data-section="my-orders">
                     <i class="fas fa-box"></i>
                     <span>My Orders</span>
                 </li>
-                <li>
+                <li data-section="manage-addresses">
                     <i class="fas fa-map-marker-alt"></i>
                     <span>Manage Addresses</span>
                 </li>
-                <li>
+                <li data-section="my-wishlist">
                     <i class="fas fa-heart"></i>
                     <span>Wishlist</span>
                 </li>
-                <li>
+                <li data-section="change-password">
                     <i class="fas fa-lock"></i>
                     <span>Change Password</span>
                 </li>
-                <li>
+                <li data-section="notifications">
                     <i class="fas fa-bell"></i>
                     <span>Notifications</span>
                 </li>
@@ -99,153 +138,176 @@
             </div>
             {% endif %}
 
-            <div class="content-header">
-                <h2>
-                    <i class="fas fa-user-edit"></i> Personal Information
-                </h2>
-                <p class="subtitle">Manage your account details and preferences</p>
-            </div>
+            <!-- Profile Info Section -->
+            <section id="profile-info" class="content-section">
+                <div class="content-header">
+                    <h2>
+                        <i class="fas fa-user-edit"></i> Personal Information
+                    </h2>
+                    <p class="subtitle">Manage your account details and preferences</p>
+                </div>
 
-            <form class="profile-form" method="post" action="{% url 'merchandise:update_profile' %}">
-                {% csrf_token %}
+                <form class="profile-form" method="post" action="{% url 'merchandise:update_profile' %}">
+                    {% csrf_token %}
 
-                <div class="form-section">
-                    <h3 class="section-title">
-                        <i class="fas fa-id-card"></i> Basic Information
-                    </h3>
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-id-card"></i> Basic Information
+                        </h3>
 
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>
-                                <i class="fas fa-user"></i> Full Name
-                            </label>
-                            <input
-                                    type="text"
-                                    name="full_name"
-                                    value="{% if request.user.profile %}{{ request.user.profile.full_name }}{% endif %}"
-                                    placeholder="Enter your full name"
-                                    required
-                            />
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>
+                                    <i class="fas fa-user"></i> Full Name
+                                </label>
+                                <input
+                                        type="text"
+                                        name="full_name"
+                                        value="{% if request.user.profile %}{{ request.user.profile.full_name }}{% endif %}"
+                                        placeholder="Enter your full name"
+                                        required
+                                />
+                            </div>
+                            <div class="form-group">
+                                <label>
+                                    <i class="fas fa-envelope"></i> Email Address
+                                </label>
+                                <input
+                                        type="email"
+                                        value="{{ request.user.email }}"
+                                        disabled
+                                        class="disabled-input"
+                                />
+                                <small class="helper-text">Email cannot be changed</small>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label>
-                                <i class="fas fa-envelope"></i> Email Address
-                            </label>
-                            <input
-                                    type="email"
-                                    value="{{ request.user.email }}"
-                                    disabled
-                                    class="disabled-input"
-                            />
-                            <small class="helper-text">Email cannot be changed</small>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>
+                                    <i class="fas fa-phone"></i> Mobile Number
+                                </label>
+                                <input
+                                        type="text"
+                                        name="mobile"
+                                        value="{% if request.user.profile %}{{ request.user.profile.mobile }}{% endif %}"
+                                        placeholder="Enter your mobile number"
+                                />
+                            </div>
+                            <div class="form-group">
+                                <label>
+                                    <i class="fas fa-venus-mars"></i> Gender
+                                </label>
+                                <select name="gender">
+                                    <option value="">Select Gender</option>
+                                    <option value="male" {% if request.user.profile.gender == 'male' %}selected{% endif %}>Male</option>
+                                    <option value="female" {% if request.user.profile.gender == 'female' %}selected{% endif %}>Female</option>
+                                    <option value="other" {% if request.user.profile.gender == 'other' %}selected{% endif %}>Other</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>
-                                <i class="fas fa-phone"></i> Mobile Number
-                            </label>
-                            <input
-                                    type="text"
-                                    name="mobile"
-                                    value="{% if request.user.profile %}{{ request.user.profile.mobile }}{% endif %}"
-                                    placeholder="Enter your mobile number"
-                            />
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-map-marked-alt"></i> Location Details
+                        </h3>
+
+                        <div class="form-row">
+                            <div class="form-group full-width">
+                                <label>
+                                    <i class="fas fa-home"></i> Address
+                                </label>
+                                <input
+                                        type="text"
+                                        name="address"
+                                        value="{% if request.user.profile %}{{ request.user.profile.address }}{% endif %}"
+                                        placeholder="Enter your address"
+                                />
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label>
-                                <i class="fas fa-venus-mars"></i> Gender
-                            </label>
-                            <select name="gender">
-                                <option value="">Select Gender</option>
-                                <option value="male" {% if request.user.profile.gender == 'male' %}selected{% endif %}>Male</option>
-                                <option value="female" {% if request.user.profile.gender == 'female' %}selected{% endif %}>Female</option>
-                                <option value="other" {% if request.user.profile.gender == 'other' %}selected{% endif %}>Other</option>
-                            </select>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>
+                                    <i class="fas fa-city"></i> City
+                                </label>
+                                <input
+                                        type="text"
+                                        name="city"
+                                        value="{% if request.user.profile %}{{ request.user.profile.city }}{% endif %}"
+                                        placeholder="Your city"
+                                />
+                            </div>
+                            <div class="form-group">
+                                <label>
+                                    <i class="fas fa-mail-bulk"></i> Postal Code
+                                </label>
+                                <input
+                                        type="text"
+                                        name="postal_code"
+                                        value="{% if request.user.profile %}{{ request.user.profile.postal_code }}{% endif %}"
+                                        placeholder="PIN code"
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="save-btn">
+                            <i class="fas fa-save"></i> Save Changes
+                        </button>
+                        <button type="reset" class="reset-btn">
+                            <i class="fas fa-undo"></i> Reset
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Account Stats Section -->
+                <div class="account-stats">
+                    <div class="stat-card">
+                        <i class="fas fa-shopping-bag"></i>
+                        <div class="stat-info">
+                            <h4>0</h4>
+                            <p>Total Orders</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-heart"></i>
+                        <div class="stat-info">
+                            <h4 id="wishlist-stat-count">0</h4>
+                            <p>Wishlist Items</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <div class="stat-info">
+                            <h4>0</h4>
+                            <p>Saved Addresses</p>
                         </div>
                     </div>
                 </div>
+            </section>
 
-                <div class="form-section">
-                    <h3 class="section-title">
-                        <i class="fas fa-map-marked-alt"></i> Location Details
-                    </h3>
+            <!-- Wishlist Section -->
+            <section id="my-wishlist" class="content-section hidden">
+                <div class="content-header">
+                    <h2><i class="fas fa-heart"></i> My Wishlist</h2>
+                    <p class="subtitle">Handcrafted items you've saved for later</p>
+                </div>
+                <div id="wishlist-grid" class="wishlist-grid"></div>
+                <div id="wishlist-empty" class="empty-state hidden">
+                    <i class="fas fa-heart-broken"></i>
+                    <p>Your wishlist is currently empty.</p>
+                </div>
+            </section>
 
-                    <div class="form-row">
-                        <div class="form-group full-width">
-                            <label>
-                                <i class="fas fa-home"></i> Address
-                            </label>
-                            <input
-                                    type="text"
-                                    name="address"
-                                    value="{% if request.user.profile %}{{ request.user.profile.address }}{% endif %}"
-                                    placeholder="Enter your address"
-                            />
-                        </div>
-                    </div>
+            <!-- Placeholders for other sections -->
+            <section id="my-orders" class="content-section hidden"><h2>My Orders</h2></section>
+            <section id="manage-addresses" class="content-section hidden"><h2>Manage Addresses</h2></section>
+            <section id="change-password" class="content-section hidden"><h2>Change Password</h2></section>
+            <section id="notifications" class="content-section hidden"><h2>Notifications</h2></section>
 
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>
-                                <i class="fas fa-city"></i> City
-                            </label>
-                            <input
-                                    type="text"
-                                    name="city"
-                                    value="{% if request.user.profile %}{{ request.user.profile.city }}{% endif %}"
-                                    placeholder="Your city"
-                            />
-                        </div>
-                        <div class="form-group">
-                            <label>
-                                <i class="fas fa-mail-bulk"></i> Postal Code
-                            </label>
-                            <input
-                                    type="text"
-                                    name="postal_code"
-                                    value="{% if request.user.profile %}{{ request.user.profile.postal_code }}{% endif %}"
-                                    placeholder="PIN code"
-                            />
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-actions">
-                    <button type="submit" class="save-btn">
-                        <i class="fas fa-save"></i> Save Changes
-                    </button>
-                    <button type="reset" class="reset-btn">
-                        <i class="fas fa-undo"></i> Reset
-                    </button>
-                </div>
-            </form>
-
-            <!-- Account Stats Section -->
-            <div class="account-stats">
-                <div class="stat-card">
-                    <i class="fas fa-shopping-bag"></i>
-                    <div class="stat-info">
-                        <h4>0</h4>
-                        <p>Total Orders</p>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <i class="fas fa-heart"></i>
-                    <div class="stat-info">
-                        <h4>0</h4>
-                        <p>Wishlist Items</p>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <i class="fas fa-map-marker-alt"></i>
-                    <div class="stat-info">
-                        <h4>0</h4>
-                        <p>Saved Addresses</p>
-                    </div>
-                </div>
-            </div>
         </main>
     </div>
 </div>
@@ -272,5 +334,7 @@
 {% endblock %}
 
 {% block extra_js %}
+<!-- Wishlist script MUST load before profile.js if not in base -->
+<script src="{% static 'merchandise/js/wishlist.js' %}"></script>
 <script src="{% static 'merchandise/js/profile.js' %}"></script>
 {% endblock %}

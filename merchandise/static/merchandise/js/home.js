@@ -22,6 +22,10 @@ function renderProducts() {
     const card = document.createElement('article');
     card.className = 'card';
     
+    // WISHLIST INTEGRATION: Check if this specific item is already in the wishlist
+    const isSaved = window.WishlistManager ? window.WishlistManager.isWishlisted(p.id) : false;
+    const heartIcon = isSaved ? 'fa-solid fa-heart active' : 'fa-regular fa-heart';
+
     // Conditional Per 100g Price Tag for Home Grid
     // Uses p.price directly as the per-100g rate for gourmet items
     const per100gTag = p.pricePer100g 
@@ -29,6 +33,11 @@ function renderProducts() {
       : '';
 
     card.innerHTML = `
+      <!-- Wishlist Toggle Button -->
+      <div class="wishlist-float-btn" onclick="event.stopPropagation(); toggleWishlist(${p.id})">
+        <i class="${heartIcon}" id="heart-home-${p.id}"></i>
+      </div>
+
       <div class="card-clickable" onclick="openProduct(${p.id})">
         <img 
           src="${p.images[0]}" 
@@ -49,6 +58,15 @@ function renderProducts() {
   });
 }
 
+// Global function to handle the wishlist toggle
+window.toggleWishlist = function(productId) {
+    const product = window.MOCK_PRODUCTS.find(p => p.id === productId);
+    if (product && window.WishlistManager) {
+        window.WishlistManager.toggleItem(product);
+        renderProducts(); // Refresh the grid to update icons
+    }
+};
+
 // Handle Add to Cart from home page
 function handleAddToCart(productId) {
   const product = window.MOCK_PRODUCTS.find(p => p.id === productId);
@@ -57,9 +75,13 @@ function handleAddToCart(productId) {
   }
 }
 
-// Handle Wishlist
+// Handle Wishlist (Updated to use the Manager)
 function handleWishlist(productId) {
-  alert('Added to wishlist (feature coming soon)');
+  const product = window.MOCK_PRODUCTS.find(p => p.id === productId);
+  if (product && window.WishlistManager) {
+    window.WishlistManager.toggleItem(product);
+    renderProducts();
+  }
 }
 
 // Currency formatting helper for Indian Rupees

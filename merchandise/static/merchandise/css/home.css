@@ -496,6 +496,41 @@ p{font-size:1rem;color:var(--fg)}
   overflow: hidden;
   padding-left: 52px; 
 }
+/* Floating like btn on the product card */
+.card { position: relative; }
+
+.wishlist-float-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 10;
+  width: 36px;
+  height: 36px;
+  background: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid rgba(0,0,0,0.05);
+}
+
+.wishlist-float-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+}
+
+.wishlist-float-btn i {
+  font-size: 18px;
+  color: #94a3b8;
+  transition: color 0.2s ease;
+}
+
+.wishlist-float-btn i.active {
+  color: #ef4444;
+}
 
 /* Cart icon */
 .view-all::before {

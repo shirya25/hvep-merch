@@ -1,6 +1,6 @@
 /**
  * Him Village Prahari - Profile Page JavaScript
- * Handles profile interactions, form validation, and logout functionality
+ * Handles profile interactions, form validation, wishlist display, and logout functionality
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -14,11 +14,15 @@ function initializeProfilePage() {
     setupFormValidation();
     setupAutoSaveIndicator();
     animateStatsOnScroll();
+    
+    // Initial wishlist count update
+    updateWishlistCount();
 }
 
-// Menu Navigation
+// Menu Navigation - Enhanced to handle section switching
 function setupMenuNavigation() {
     const menuItems = document.querySelectorAll('.menu li:not(.logout)');
+    const sections = document.querySelectorAll('.content-section');
     
     menuItems.forEach(item => {
         item.addEventListener('click', function() {
@@ -27,20 +31,111 @@ function setupMenuNavigation() {
             // Add active class to clicked item
             this.classList.add('active');
             
-            // You can add navigation logic here
+            // Logic to switch sections based on data-section attribute
+            const sectionId = this.getAttribute('data-section');
+            if (sectionId) {
+                sections.forEach(sec => sec.classList.add('hidden'));
+                const targetSection = document.getElementById(sectionId);
+                if (targetSection) {
+                    targetSection.classList.remove('hidden');
+                    
+                    // If switching to wishlist, render items
+                    if (sectionId === 'my-wishlist') {
+                        renderWishlistItems();
+                    }
+                }
+            }
+
             const menuText = this.textContent.trim();
             console.log(`Navigating to: ${menuText}`);
-            
-            // Example: Show different sections based on menu item
-            // This can be expanded based on your needs
         });
     });
 }
 
+// Wishlist Rendering Logic
+function renderWishlistItems() {
+    const grid = document.getElementById('wishlist-grid');
+    const emptyState = document.getElementById('wishlist-empty');
+    if (!grid || !emptyState || !window.WishlistManager) return;
+
+    // Fetch items and ensure we have an array
+    const rawItems = window.WishlistManager.getItems();
+    const items = Array.isArray(rawItems) ? rawItems : [];
+
+    // Clear grid initially to prevent glitches
+    grid.innerHTML = '';
+
+    // Robust check for items length to toggle visibility
+    if (items.length > 0) {
+        // Hide empty state if there are products - using style.display to bypass CSS specificity issues
+        emptyState.style.display = 'none';
+        emptyState.classList.add('hidden');
+        
+        // Render items to the grid
+        grid.innerHTML = items.map(p => {
+            const productImage = (p.images && p.images.length > 0) 
+                ? p.images[0] 
+                : 'https://placehold.co/400x400/10B981/ffffff?text=Product';
+
+            return `
+                <div class="wishlist-item-card">
+                    <button class="remove-wishlist" onclick="removeAndRefresh(${p.id})">
+                        &times;
+                    </button>
+                    <img src="${productImage}" alt="${p.name}" style="width: 100%; height: 160px; object-fit: cover; border-radius: 8px; margin-bottom: 12px;">
+                    <div class="wishlist-details">
+                        <h4 style="margin: 0 0 8px; font-size: 1.1rem; color: #1e293b;">${p.name}</h4>
+                        <p style="color: #1b8f4b; font-weight: 700; font-size: 1.2rem; margin-bottom: 12px;">₹${p.price}</p>
+                        <button onclick="handleProfileAddToCart(${p.id})" 
+                            style="width: 100%; padding: 10px; background: #1b8f4b; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: opacity 0.2s;">
+                            Add to Cart
+                        </button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    } else {
+        // Show empty state only if items are strictly 0
+        emptyState.style.display = 'block';
+        emptyState.classList.remove('hidden');
+    }
+}
+
+// Remove item and update UI
+window.removeAndRefresh = function(id) {
+    if (window.WishlistManager) {
+        const items = window.WishlistManager.getItems();
+        const product = items.find(p => p.id === id);
+        if (product) {
+            window.WishlistManager.toggleItem(product);
+            renderWishlistItems();
+            updateWishlistCount();
+        }
+    }
+};
+
+// Update the stat cards count
+function updateWishlistCount() {
+    const rawItems = window.WishlistManager ? window.WishlistManager.getItems() : [];
+    const items = Array.isArray(rawItems) ? rawItems : [];
+    const countDisplay = document.getElementById('wishlist-stat-count');
+    if (countDisplay) {
+        countDisplay.textContent = items.length;
+    }
+}
+
+// Handle cart addition from within profile
+window.handleProfileAddToCart = function(productId) {
+    const product = (window.MOCK_PRODUCTS || []).find(p => p.id === productId);
+    if (product && window.CartManager) {
+        window.CartManager.addItem(product);
+    }
+};
+
 // Logout Modal Functions
 function confirmLogout() {
     const modal = document.getElementById('logoutModal');
-    modal.classList.add('active');
+    if (modal) modal.classList.add('active');
     
     // Prevent body scroll when modal is open
     document.body.style.overflow = 'hidden';
@@ -48,7 +143,7 @@ function confirmLogout() {
 
 function closeLogoutModal() {
     const modal = document.getElementById('logoutModal');
-    modal.classList.remove('active');
+    if (modal) modal.classList.remove('active');
     
     // Restore body scroll
     document.body.style.overflow = 'auto';
@@ -91,8 +186,8 @@ function setupFormValidation() {
     
     // Form submit validation
     form.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
+        // Only prevent default if we want to handle via JS/AJAX, 
+        // otherwise let standard POST happen after validation.
         let isValid = true;
         inputs.forEach(input => {
             if (!validateField(input)) {
@@ -102,9 +197,8 @@ function setupFormValidation() {
         
         if (isValid) {
             showSaveLoading();
-            // Submit the form
-            this.submit();
         } else {
+            e.preventDefault();
             showNotification('Please correct the errors before saving', 'error');
         }
     });
@@ -217,20 +311,11 @@ function setupAutoSaveIndicator() {
     if (!form) return;
     
     const inputs = form.querySelectorAll('input:not([disabled]), select');
-    let saveTimeout;
     
     inputs.forEach(input => {
         input.addEventListener('input', function() {
-            clearTimeout(saveTimeout);
-            
             // Show "unsaved changes" indicator
             showUnsavedIndicator();
-            
-            // Optional: Auto-save after 2 seconds of inactivity
-            // saveTimeout = setTimeout(() => {
-            //     console.log('Auto-saving...');
-            //     // Implement auto-save logic here
-            // }, 2000);
         });
     });
 }
@@ -243,13 +328,13 @@ function showUnsavedIndicator() {
     const originalText = saveBtn.innerHTML;
     saveBtn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Unsaved Changes';
     
-    // Reset after form submit or after timeout
+    // Reset after some time if no more changes occur
     setTimeout(() => {
         if (saveBtn.classList.contains('unsaved')) {
             saveBtn.classList.remove('unsaved');
             saveBtn.innerHTML = originalText;
         }
-    }, 5000);
+    }, 8000);
 }
 
 // Animate stats on scroll
@@ -277,33 +362,15 @@ function animateStatsOnScroll() {
 // Mobile number formatting
 function formatMobileNumber(input) {
     let value = input.value.replace(/\D/g, '');
-    
-    // Format as: +91 XXXXX XXXXX
-    if (value.length > 10) {
-        value = value.slice(0, 10);
-    }
-    
-    if (value.length > 5) {
-        value = value.slice(0, 5) + ' ' + value.slice(5);
-    }
-    
+    if (value.length > 10) value = value.slice(0, 10);
+    if (value.length > 5) value = value.slice(0, 5) + ' ' + value.slice(5);
     input.value = value;
-}
-
-// Add mobile formatting to mobile input
-const mobileInput = document.querySelector('input[name="mobile"]');
-if (mobileInput) {
-    mobileInput.addEventListener('input', function() {
-        // Allow only numbers, spaces, +, -, ()
-        this.value = this.value.replace(/[^\d\s\+\-\(\)]/g, '');
-    });
 }
 
 // PIN code formatting
 const pinInput = document.querySelector('input[name="postal_code"]');
 if (pinInput) {
     pinInput.addEventListener('input', function() {
-        // Allow only numbers and limit to 6 digits
         this.value = this.value.replace(/\D/g, '').slice(0, 6);
     });
 }
@@ -315,10 +382,7 @@ window.addEventListener('load', () => {
 
 // Handle browser back button
 window.addEventListener('popstate', () => {
-    const modal = document.getElementById('logoutModal');
-    if (modal && modal.classList.contains('active')) {
-        closeLogoutModal();
-    }
+    closeLogoutModal();
 });
 
 // Export functions for use in HTML

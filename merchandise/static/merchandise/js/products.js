@@ -125,7 +125,6 @@ const MOCK_PRODUCTS = [
   }
 ];
 
-
 let selectedProduct = null;
 let currentImageIndex = 0;
 let activeFilters = {
@@ -301,32 +300,50 @@ function renderProductGrid(products) {
 
     grid.innerHTML = products.map(product => {
         const firstImage = product.images?.[0] || 'https://placehold.co/600x400/34D399/ffffff?text=Eco+Product';
-        // Logic fix: Use product.price as the per-100g rate
+        
+        // Wishlist State Check
+        const isWishlisted = window.WishlistManager?.isWishlisted(product.id);
+        const heartClass = isWishlisted ? 'fa-solid fa-heart active' : 'fa-regular fa-heart';
+
         const per100gTag = product.pricePer100g 
             ? `<span class="price-per-100g text-xs text-gray-500 font-normal block"> (₹${product.price.toLocaleString('en-IN')} / 100g)</span>` 
             : '';
 
         return `
-            <div class="product-card" onclick="viewProductDetail(${product.id})">
-                <img 
-                    src="${firstImage}" 
-                    alt="${product.name}" 
-                    class="product-image"
-                    onerror="this.onerror=null;this.src='https://placehold.co/600x400/34D399/ffffff?text=Image+Missing';"
-                >
-                <div class="card-info">
-                    <h4>${product.name}</h4>
-                    <div class="flex justify-between items-center mt-2">
-                        <div class="price-container">
-                          <p class="card-price">₹${product.price.toLocaleString('en-IN')}</p>
-                          ${per100gTag}
+            <div class="product-card">
+                <!-- Wishlist Toggle Button -->
+                <div class="wishlist-float-btn" onclick="event.stopPropagation(); toggleProductWishlist(${product.id})">
+                    <i class="${heartClass}" id="heart-prod-${product.id}"></i>
+                </div>
+                <div onclick="viewProductDetail(${product.id})">
+                    <img 
+                        src="${firstImage}" 
+                        alt="${product.name}" 
+                        class="product-image"
+                        onerror="this.onerror=null;this.src='https://placehold.co/600x400/34D399/ffffff?text=Image+Missing';"
+                    >
+                    <div class="card-info">
+                        <h4>${product.name}</h4>
+                        <div class="flex justify-between items-center mt-2">
+                            <div class="price-container">
+                              <p class="card-price">₹${product.price.toLocaleString('en-IN')}</p>
+                              ${per100gTag}
+                            </div>
+                            ${getStarRatingHTML(product.rating)}
                         </div>
-                        ${getStarRatingHTML(product.rating)}
                     </div>
                 </div>
             </div>
         `;
     }).join('');
+}
+
+function toggleProductWishlist(productId) {
+    const product = MOCK_PRODUCTS.find(p => p.id === productId);
+    if (product && window.WishlistManager) {
+        window.WishlistManager.toggleItem(product);
+        applyFilters(); // Re-render to update the heart icons
+    }
 }
 
 function navigateImage(direction) {
@@ -497,4 +514,5 @@ window.navigateImage = navigateImage;
 window.handleProductDetailAddToCart = handleProductDetailAddToCart;
 window.toggleFilterModal = toggleFilterModal;
 window.applyFilters = applyFilters;
+window.toggleProductWishlist = toggleProductWishlist;
 window.MOCK_PRODUCTS = MOCK_PRODUCTS;

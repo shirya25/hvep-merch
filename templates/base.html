@@ -16,6 +16,42 @@
 <link rel="stylesheet" href="{% static 'merchandise/css/footer.css' %}">
 {% block extra_css %}{% endblock %}
 
+<!-- Global Wishlist Styles (Heart Icon) -->
+<style>
+    .wishlist-float-btn {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        z-index: 5;
+        background: white;
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border: 1px solid rgba(0,0,0,0.05);
+    }
+    .wishlist-float-btn:hover { 
+        transform: scale(1.1); 
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+    .wishlist-float-btn i { 
+        color: #ccc; 
+        font-size: 18px;
+        transition: color 0.2s; 
+    }
+    /* Active heart color */
+    .wishlist-float-btn i.fa-solid.active { 
+        color: #ff4757 !important; 
+    }
+    
+    /* Ensure parent containers are relative for correct positioning */
+    .card, .product-card, .wishlist-item-card { position: relative; }
+</style>
 
 </head>
 
@@ -173,17 +209,15 @@
     </div>
 </footer>
 
-
-
-<!-- Global JS -->
-{% block extra_js %}
-{% endblock %}
-
-
+<!-- Global Scripts -->
+<script src="{% static 'merchandise/js/wishlist.js' %}"></script>
 <script src="{% static 'merchandise/js/cart.js' %}"></script>
 <script src="{% static 'merchandise/js/navscript.js' %}"></script>
 <script src="{% static 'merchandise/js/footer.js' %}"></script>
 
+<!-- Page Specific Scripts -->
+{% block extra_js %}
+{% endblock %}
 
 </body>
 </html>
