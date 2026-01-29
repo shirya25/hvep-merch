@@ -1,52 +1,54 @@
-// Cart Management
+// Cart Management - Integrated with CartManager from cart.js
 let cart = [];
 let cartCount = 0;
 
 // Initialize cart from localStorage if available
 function initCart() {
-    const savedCart = localStorage.getItem('hvep_cart');
-    if (savedCart) {
-        cart = JSON.parse(savedCart);
-        cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+    // Wait for CartManager to be available
+    if (window.CartManager) {
         updateCartDisplay();
+        // Set up periodic updates to sync cart count
+        setInterval(updateCartDisplay, 500);
+    } else {
+        // Retry after a short delay if CartManager isn't loaded yet
+        setTimeout(initCart, 100);
     }
 }
 
 // Update cart count display
 function updateCartDisplay() {
     const cartCountElement = document.getElementById('cartCount');
-    if (cartCountElement) {
-        cartCountElement.textContent = cartCount;
+    if (cartCountElement && window.CartManager) {
+        const count = window.CartManager.getCount();
+        cartCountElement.textContent = count;
 
         // Add animation when count changes
-        cartCountElement.style.transform = 'scale(1.3)';
-        setTimeout(() => {
-            cartCountElement.style.transform = 'scale(1)';
-        }, 200);
+        if (count !== cartCount) {
+            cartCountElement.style.transform = 'scale(1.3)';
+            setTimeout(() => {
+                cartCountElement.style.transform = 'scale(1)';
+            }, 200);
+        }
+
+        cartCount = count;
+        cart = window.CartManager.getItems();
     }
 }
 
-// Add item to cart
+// Add item to cart - delegates to CartManager
 function addToCart(item) {
-    const existingItem = cart.find(cartItem => cartItem.id === item.id);
-
-    if (existingItem) {
-        existingItem.quantity += 1;
+    if (window.CartManager) {
+        window.CartManager.addItem(item);
+        // Notification is already shown by CartManager
     } else {
-        cart.push({ ...item, quantity: 1 });
+        console.error('CartManager not available');
     }
-
-    cartCount++;
-    updateCartDisplay();
-    saveCart();
-    showCartNotification('Item added to cart!');
 }
 
-// Save cart to localStorage
+// Save cart to localStorage - handled by CartManager
 function saveCart() {
-    localStorage.setItem('hvep_cart', JSON.stringify(cart));
+    // This is now handled by CartManager
 }
-
 // Show cart notification
 function showCartNotification(message) {
     const notification = document.createElement('div');

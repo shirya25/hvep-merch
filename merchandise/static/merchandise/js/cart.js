@@ -92,7 +92,15 @@ const CartManager = (function() {
   }
 
   // Update cart display (for cart page)
+  // Update cart display (for cart page)
   function updateCartDisplay() {
+    // Update navbar cart count (always, regardless of page)
+    const navCartCount = document.getElementById('cartCount');
+    if (navCartCount) {
+      const count = getCount();
+      navCartCount.textContent = count;
+    }
+
     const emptyCart = document.getElementById('empty-cart');
     const cartWithItems = document.getElementById('cart-with-items');
     const cartItemsList = document.getElementById('cart-items-list');
